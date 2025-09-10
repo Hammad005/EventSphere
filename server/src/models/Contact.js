@@ -6,11 +6,11 @@ const contactSchema = new mongoose.Schema({
         require: true
     },
     email: {
-        type: true,
+        type: String,
         require: true
     },
     message: {
-        type: true,
+        type: String,
         require: true
     }
 }, {timestamps: true});

@@ -5,6 +5,7 @@ import cookirParser from "cookie-parser";
 import connectDb from "./config/connectDB.js";
 import authRouter from "./routes/authRoutes.js";
 import eventRouter from "./routes/eventRoutes.js";
+import contactRouter from "./routes/contactRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT

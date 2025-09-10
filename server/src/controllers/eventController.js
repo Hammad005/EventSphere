@@ -248,6 +248,77 @@ export const registerInEvent = async (req, res) => {
     }
 };
 
+export const eventAttended = async (req, res) => {
+    const { id, userId } = req.params;
+    try {
+        const event = await Event.findById(id);
+        if (!event) {
+            return res.status(404).json({ error: "Event not found" });
+        };
+        if (req.user?.role !== "admin" && event?.organizer !== req.user?._id) {
+            return res.status(403).json({ error: "You are not eligible to mark user attendance" });
+        };
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "Event not found" });
+        };
+
+        // prevent duplicate attendance in user
+        const alreadyAttendedUser = user.registeredEvents.some(
+            (r) => r.eventId.toString() === event._id.toString() && r.status === "attended"
+        );
+        if (alreadyAttendedUser) {
+            return res.status(400).json({ error: "Already attended for this event" });
+        }
+
+        // prevent duplicate attendance in event
+        const alreadyAttendedEvent = event.participants.some(
+            (p) => p.user.toString() === user._id.toString() && p.attended === true
+        );
+        if (alreadyAttendedEvent) {
+            return res.status(400).json({ error: "Already attended for this event" });
+        }
+
+        const registeredEvent = user.registeredEvents.find(
+            (r) => r.eventId.toString() === event._id.toString()
+        );
+
+        if (registeredEvent) {
+            registeredEvent.attendanceStatus = "attended";
+
+            // If payment is still pending, mark as paid on attendance
+            if (registeredEvent.paymentStatus === "pending") {
+                registeredEvent.paymentStatus = "paid";
+            }
+        }
+
+        await user.save();
+
+
+        event.status = "ongoing";
+        const participant = event.participants.find(
+            (r) => r.user.toString() === user._id.toString()
+        );
+
+        if (participant) {
+            participant.attended = true;
+
+            // If payment is still pending, mark as paid on attendance
+            if (participant.paymentStatus === "pending") {
+                participant.paymentStatus = "paid";
+            }
+        }
+
+        await event.save();
+
+        res.status(200).json({ message: "Successfully marked user attendance" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message || "Internal Server Error" });
+    }
+};
+
 export const eventFeedback = async (req, res) => {
     const { id } = req.params;
     const { name, message, rating } = req.body;
