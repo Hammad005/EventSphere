@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 
 export const signup = async (req, res) => {
-    const { name, email, password, enrollmentNumber, role, phone, department } = req.body;
+    const { name, email, password, role, phone, department } = req.body;
     try {
         if (password.length < 6) {
             return res.status(400).json({
@@ -29,6 +29,17 @@ export const signup = async (req, res) => {
             phone,
             department,
         });
+
+        const generateEnrollmentNumber = (departmentCode) => {
+            const year = new Date().getFullYear();
+            const random = Math.floor(10000 + Math.random() * 90000); // 5-digit random number
+            return `${departmentCode.slice(0, 3).toUpperCase()}-${year}-${random}`;
+        };
+        if (role === "participant") {
+            generateEnrollmentNumber(department);
+            user.enrollmentNumber = generateEnrollmentNumber(department);
+            await user.save();
+        }
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
             expiresIn: "2d"
@@ -79,7 +90,7 @@ export const login = async (req, res) => {
         delete userWithoutPassword.password
 
         res.cookie("EventSphereAuth", token, {
-            maxAge: 2 * 24 * 60 * 60 * 1000, 
+            maxAge: 2 * 24 * 60 * 60 * 1000,
             httpOnly: true,
             sameSite: process.env.NODE_ENV === "production" ? "None" : "strict",
             secure: process.env.NODE_ENV === "production",
@@ -94,13 +105,44 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-      try {
+    try {
         res.clearCookie("EventSphereAuth", {
             httpOnly: true,
             sameSite: process.env.NODE_ENV === "production" ? "None" : "strict",
             secure: process.env.NODE_ENV === "production",
         });
         res.status(200).json({ message: "Logout successful" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message || "Internal Server Error" });
+    }
+};
+
+export const update = async (req, res) => {
+    const { name, email, phone } = req.body;
+    try {
+        if (email !== req.user.email) {
+            const emailExist = await User.findOne({ email });
+            if (emailExist) {
+                return res.status(400).json({ error: "Email already in use" });
+            }
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const updateUser = await User.findByIdAndUpdate(user._id, {
+            name,
+            email,
+            phone
+        });
+
+        const userWithoutPassword = { ...updateUser._doc }
+        delete userWithoutPassword.password
+
+        res.status(200).json({ message: "Updated successfully", user: userWithoutPassword });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: error.message || "Internal Server Error" });
