@@ -8,6 +8,6 @@ authRouter.post('/signup', signup);
 authRouter.post('/login', login);
 authRouter.post('/logout', logout);
 
-authRouter.put('/upadte', protectRoute, update);
+authRouter.put('/update', protectRoute, update);
 
 export default authRouter;

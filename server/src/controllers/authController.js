@@ -119,7 +119,7 @@ export const logout = async (req, res) => {
 };
 
 export const update = async (req, res) => {
-    const { name, email, phone } = req.body;
+    const { name, email, phone, department } = req.body;
     try {
         if (email !== req.user.email) {
             const emailExist = await User.findOne({ email });
@@ -128,16 +128,17 @@ export const update = async (req, res) => {
             }
         }
 
-        const user = await User.findOne({ email });
+        const user = await User.findById(req.user._id);
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        const updateUser = await User.findByIdAndUpdate(user._id, {
+        const updateUser = await User.findByIdAndUpdate(req.user._id, {
             name,
             email,
-            phone
-        });
+            phone,
+            department
+        }, {new: true});
 
         const userWithoutPassword = { ...updateUser._doc }
         delete userWithoutPassword.password
