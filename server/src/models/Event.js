@@ -116,7 +116,7 @@ const eventSchema = new mongoose.Schema(
             ref: "User", // Admin who approved it
         },
 
-        approve: {
+        approved: {
             type: Boolean,
             default: false
         }

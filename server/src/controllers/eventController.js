@@ -37,12 +37,42 @@ export const createEvent = async (req, res) => {
             medias: uploadedMedia
         });
 
-        await User.findById(req.user?._id).updateOne({ $push: { managedEvents: event?._id } });
+        await User.updateOne({ _id: req.user?._id }, { $push: { managedEvents: event?._id } });
         res.status(201).json({ message: "Event created successfully", event });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: error.message || "Internal Server Error" });
     };
+};
+
+export const approveEvent = async (req, res) => {
+    const { id } = req.params;
+    try {
+        if (req.user?.role !== "admin") {
+            return res.status(403).json({ error: "You are not authorized to approve this event" });
+        }
+        const event = await Event.findById(id);
+        if (!event) {
+            return res.status(404).json({ error: "Event not found" });
+        }
+
+        event?.createdBy = req.user?._id;
+        event?.approved = true;
+        await event.save();
+
+        await User.updateMany({}, {
+            $push: {
+                notifications: {
+                    message: `New upcoming event "${event?.title}", last date of registration ${new Date(
+                        event?.registrationDeadline
+                    ).toLocaleDateString()}. Register now!`
+                }
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message || "Internal Server Error" });
+    }
 };
 
 export const editEvent = async (req, res) => {
@@ -105,14 +135,14 @@ export const deleteEvent = async (req, res) => {
 };
 
 export const cancelEvent = async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
     try {
         const event = await Event.findById(id);
         if (!event) {
             return res.status(404).json({ error: "Event not found" });
         }
         if (req.user?.role !== "admin" && event?.organizer !== req.user?._id) {
-            return res.status(403).json({ error: "You are not authorized to delete this event" });
+            return res.status(403).json({ error: "You are not authorized to cancel this event" });
         }
 
         event?.status = "cancelled";
@@ -121,7 +151,7 @@ export const cancelEvent = async (req, res) => {
         const user = await User.findById(req.user?._id);
         user.registeredEvents.find((r) => r.eventId.toString() === event._id.toString()).status = "cancelled";
         await user.save();
-        
+
         return res.status(200).json({
             message: "Event cancelled successfully",
             eventId: id,
