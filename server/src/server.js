@@ -4,6 +4,7 @@ import 'dotenv/config';
 import cookirParser from "cookie-parser";
 import connectDb from "./config/connectDB.js";
 import authRouter from "./routes/authRoutes.js";
+import eventRouter from "./routes/eventRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT
@@ -18,6 +19,7 @@ app.use(cors({
 app.use(cookirParser());
 
 app.use('/api/auth', authRouter)
+app.use('/api/event', eventRouter)
 
 
 app.listen(PORT, () => {
