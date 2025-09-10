@@ -10,4 +10,6 @@ authRouter.post('/logout', logout);
 
 authRouter.put('/update', protectRoute, update);
 
+authRouter.get('/me', protectRoute, (req, res) => res.status(200).json(req.user));
+
 export default authRouter;
