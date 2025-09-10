@@ -15,6 +15,7 @@ app.use(express.json({
 app.use(cors({
     credentials: true,
     origin: process.env.CLIENT_URL, 
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
 }));
 app.use(cookirParser());
 

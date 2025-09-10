@@ -9,7 +9,7 @@ authRouter.post('/login', login);
 authRouter.post('/logout', logout);
 
 authRouter.put('/update', protectRoute, update);
-authRouter.put('/deactivate/:id', protectRoute, deactivate);
+authRouter.patch('/deactivate/:id', protectRoute, deactivate);
 
 authRouter.get('/me', protectRoute, (req, res) => res.status(200).json(req.user));
 

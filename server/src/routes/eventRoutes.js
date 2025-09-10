@@ -9,8 +9,8 @@ eventRouter.get('/getAllEvents', allEvents);
 eventRouter.post('/create', protectRoute, createEvent);
 
 eventRouter.put('/edit/:id', protectRoute, editEvent);
-eventRouter.put('/cancel/:id', protectRoute, cancelEvent);
-eventRouter.put('/approve/:id', protectRoute, approveEvent);
+eventRouter.patch('/cancel/:id', protectRoute, cancelEvent);
+eventRouter.patch('/approve/:id', protectRoute, approveEvent);
 
 eventRouter.delete('/delete/:id', protectRoute, deleteEvent);
 
