@@ -12,7 +12,11 @@ export const protectRoute = async (req, res, next) => {
             const user = await User.findById(decoded.id).select("-password");
             if (!user) {
                 return res.status(401).json({ error: "Unauthorized, Please login" });
-            };
+            } else if (!user?.isActive) {
+                return res.status(403).json({
+                    error: "Your account has been deactivated by the administrator. Please contact support for further assistance."
+                });
+            }
             req.user = user;
             next();
         } catch (error) {

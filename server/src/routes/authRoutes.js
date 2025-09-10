@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login, logout, signup, update } from "../controllers/authController.js";
+import { deactivate, login, logout, signup, update } from "../controllers/authController.js";
 import { protectRoute } from "../middleware/protectRoute.js";
 
 const authRouter = Router();
@@ -9,6 +9,7 @@ authRouter.post('/login', login);
 authRouter.post('/logout', logout);
 
 authRouter.put('/update', protectRoute, update);
+authRouter.put('/deactivate/:id', protectRoute, deactivate);
 
 authRouter.get('/me', protectRoute, (req, res) => res.status(200).json(req.user));
 

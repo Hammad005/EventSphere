@@ -149,3 +149,22 @@ export const update = async (req, res) => {
         res.status(500).json({ error: error.message || "Internal Server Error" });
     }
 };
+
+
+export const deactivate = async (req, res) => {
+    const {id} = req.params;
+    try {
+        if (req.user?.role !== "admin") {
+             return res.status(403).json({ error: "You are not eligible to deactivate this user" });
+        }
+
+        const user = await User.findById(id);
+        user?.isActive = false;
+        await user.save();
+
+        res.status(200).json({ message: "User deactivated successfully" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message || "Internal Server Error" });
+    }
+}

@@ -49,7 +49,7 @@ export const approveEvent = async (req, res) => {
     const { id } = req.params;
     try {
         if (req.user?.role !== "admin") {
-            return res.status(403).json({ error: "You are not authorized to approve this event" });
+            return res.status(403).json({ error: "You are not eligible to approve this event" });
         }
         const event = await Event.findById(id);
         if (!event) {
