@@ -56,8 +56,8 @@ export const approveEvent = async (req, res) => {
             return res.status(404).json({ error: "Event not found" });
         }
 
-        event?.createdBy = req.user?._id;
-        event?.approved = true;
+        event.createdBy = req.user?._id;
+        event.approved = true;
         await event.save();
 
         await User.updateMany({}, {
@@ -145,7 +145,7 @@ export const cancelEvent = async (req, res) => {
             return res.status(403).json({ error: "You are not authorized to cancel this event" });
         }
 
-        event?.status = "cancelled";
+        event.status = "cancelled";
         await event?.save();
 
         const user = await User.findById(req.user?._id);
@@ -244,6 +244,30 @@ export const registerInEvent = async (req, res) => {
         console.log(error);
         res
             .status(500)
+            .json({ error: error.message || "Internal Server Error" });
+    }
+};
+
+export const eventFeedback = async (req, res) => {
+    const { id } = req.params;
+    const { name, message, rating } = req.body;
+    try {
+        const event = await Event.findById(id);
+        if (!event) {
+            return res.status(404).json({ error: "Event maybe deleted or not found" });
+        }
+
+        event.feedback?.push({
+            name,
+            message,
+            rating
+        });
+
+        await event.save();
+        return res.status(200).json({ message: "Successfully submitted feedback" });
+    } catch (error) {
+        console.log(error);
+        res.status(500)
             .json({ error: error.message || "Internal Server Error" });
     }
 };

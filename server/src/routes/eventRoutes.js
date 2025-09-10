@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { protectRoute } from '../middleware/protectRoute.js';
-import { allEvents, cancelEvent, createEvent, deleteEvent, editEvent, registerInEvent } from '../controllers/eventController.js';
+import { allEvents, approveEvent, cancelEvent, createEvent, deleteEvent, editEvent, eventFeedback, registerInEvent } from '../controllers/eventController.js';
 
 const eventRouter = Router();
 
@@ -15,5 +15,6 @@ eventRouter.patch('/approve/:id', protectRoute, approveEvent);
 eventRouter.delete('/delete/:id', protectRoute, deleteEvent);
 
 eventRouter.post('/register/:id', protectRoute, registerInEvent);
+eventRouter.post('/feedback/:id', protectRoute, eventFeedback);
 
 export default eventRouter;

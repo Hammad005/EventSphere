@@ -159,7 +159,7 @@ export const deactivate = async (req, res) => {
         }
 
         const user = await User.findById(id);
-        user?.isActive = false;
+        user.isActive = false
         await user.save();
 
         res.status(200).json({ message: "User deactivated successfully" });

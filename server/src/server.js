@@ -21,6 +21,7 @@ app.use(cookirParser());
 
 app.use('/api/auth', authRouter)
 app.use('/api/event', eventRouter)
+app.use('/api/contact', contactRouter)
 
 
 app.listen(PORT, () => {
