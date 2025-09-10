@@ -11,9 +11,9 @@ export const signup = async (req, res) => {
             })
         };
 
-        const exisitingUser = await User.find({ email });
+        const exisitingUser = await User.findOne({ email });
 
-        if (exisitingUser.length > 0) {
+        if (exisitingUser) {
             return res.status(400).json({
                 success: false,
                 error: "Email already in use",
@@ -38,7 +38,7 @@ export const signup = async (req, res) => {
         delete userWithoutPassword.password
 
         res.cookie("EventSphereAuth", token, {
-            maxAge: 2 * 24 * 60 * 60 * 1000, // 
+            maxAge: 2 * 24 * 60 * 60 * 1000,
             httpOnly: true,
             sameSite: process.env.NODE_ENV === "production" ? "None" : "strict",
             secure: process.env.NODE_ENV === "production",
@@ -49,5 +49,60 @@ export const signup = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: error.message || "Internal Server Error" })
+    }
+};
+
+export const login = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const existingUser = await User.findOne({ email });
+        if (!existingUser) {
+            return res.status(400).json({
+                success: false,
+                error: "Invalid Credentials"
+            })
+        };
+
+        const isMatch = await existingUser.matchPassword(password);
+        if (!isMatch) {
+            return res.status(400).json({
+                success: false,
+                error: "Invalid Credentials"
+            })
+        };
+
+        const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET, {
+            expiresIn: "2d"
+        });
+
+        const userWithoutPassword = { ...existingUser._doc }
+        delete userWithoutPassword.password
+
+        res.cookie("EventSphereAuth", token, {
+            maxAge: 2 * 24 * 60 * 60 * 1000, 
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === "production" ? "None" : "strict",
+            secure: process.env.NODE_ENV === "production",
+        })
+            .status(201)
+            .json({ user: userWithoutPassword })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message || "Internal Server Error" })
+    }
+};
+
+export const logout = async (req, res) => {
+      try {
+        res.clearCookie("EventSphereAuth", {
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === "production" ? "None" : "strict",
+            secure: process.env.NODE_ENV === "production",
+        });
+        res.status(200).json({ message: "Logout successful" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message || "Internal Server Error" });
     }
 };
