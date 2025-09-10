@@ -76,7 +76,7 @@ const eventSchema = new mongoose.Schema(
                 paymentStatus: {
                     type: String,
                     enum: ["pending", "paid", "not_required"],
-                    default: "pending",
+                    default: "not_required",
                 },
                 attended: {
                     type: Boolean,
