@@ -257,7 +257,9 @@ export const eventAttended = async (req, res) => {
         };
         if (req.user?.role !== "admin" && event?.organizer !== req.user?._id) {
             return res.status(403).json({ error: "You are not eligible to mark user attendance" });
-        };
+        } else if(startDate > new Date() || endDate < new Date()) {
+            return res.status(400).json({ error: "Event registration deadline has passed" });
+        }
 
         const user = await User.findById(userId);
         if (!user) {
@@ -313,6 +315,67 @@ export const eventAttended = async (req, res) => {
         await event.save();
 
         res.status(200).json({ message: "Successfully marked user attendance" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message || "Internal Server Error" });
+    }
+};
+
+export const issueCertificate = async (req, res) => {
+    const { id, userId } = req.params;
+    try {
+        const event = await Event.findById(id);
+        if (!event) {
+            return res.status(404).json({ error: "Event not found" });
+        };
+        if (req.user?.role !== "admin" && event?.organizer !== req.user?._id) {
+            return res.status(403).json({ error: "You are not eligible to issue the certificate" });
+        };
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "Event not found" });
+        };
+
+        // prevent duplicate attendance in user
+        const alreadyAttendedUser = user.registeredEvents.some(
+            (r) => r.eventId.toString() === event._id.toString() && r.certificateIssued === true
+        );
+        if (alreadyAttendedUser) {
+            return res.status(400).json({ error: "Already issued certificate for this event" });
+        }
+
+        // prevent duplicate attendance in event
+        const alreadyAttendedEvent = event.participants.some(
+            (p) => p.user.toString() === user._id.toString() && p.certificateIssued === true
+        );
+        if (alreadyAttendedEvent) {
+            return res.status(400).json({ error: "Already issued certificate for this event" });
+        }
+
+        const registeredEvent = user.registeredEvents.find(
+            (r) => r.eventId.toString() === event._id.toString()
+        );
+
+        if (registeredEvent) {
+            registeredEvent.certificateIssued = true;
+        }
+
+        await user.save();
+
+
+        event.status = "completed";
+        const participant = event.participants.find(
+            (r) => r.user.toString() === user._id.toString()
+        );
+
+        if (participant) {
+            participant.certificateIssued = true;
+        }
+
+        await event.save();
+
+        res.status(200).json({ message: "Successfully issued certificate" });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: error.message || "Internal Server Error" });
