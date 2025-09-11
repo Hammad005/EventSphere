@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Info, UserRoundPlus } from "lucide-react";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -17,8 +17,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import gsap from "gsap";
+import { useNavigate } from "react-router-dom";
+import { useGSAP } from "@gsap/react";
 
 const Signup = () => {
+  const cardRef = useRef(null);
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -72,9 +76,33 @@ const Signup = () => {
       // Handle form submission
     }
   };
+
+  useGSAP(() => {
+    gsap.fromTo(
+      cardRef.current,
+      { rotationY: -90, transformOrigin: "top center", opacity: 0 },
+      {
+        rotationY: 0,
+        opacity: 1,
+        duration: 1,
+        ease: "power2.out",
+      }
+    );
+  });
+
+  const navigate = useNavigate();
+
+  const handleNavigateToSignup = () => {
+    gsap.to(cardRef.current, {
+      rotationY: 90,
+      duration: 0.6,
+      ease: "power2.inOut",
+      onComplete: () => navigate("/signin"),
+    });
+  };
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-75px)] w-full md:px-0 p-6">
-      <Card className={"md:w-1/2 w-full"}>
+      <Card className={"md:w-1/2 w-full"} ref={cardRef}>
         <CardHeader>
           <CardTitle className={"flex items-center gap-2"}>
             <UserRoundPlus className="size-5" />
@@ -272,6 +300,17 @@ const Signup = () => {
               <Button type="submit" className={"w-full mt-3"}>
                 Signup
               </Button>
+
+              <p className="text-xs text-center">
+                Already have an account?{" "}
+                <button
+                type="button"
+                onClick={handleNavigateToSignup}
+                className="hover:underline font-semibold cursor-pointer"
+                >
+                  Signin
+                </button>
+              </p>
             </form>
           </CardContent>
         </CardHeader>
