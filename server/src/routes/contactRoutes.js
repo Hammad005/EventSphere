@@ -5,6 +5,6 @@ const contactRouter = Router();
 
 contactRouter.get('/', getMessage)
 contactRouter.post('/send', sendMessage)
-contactRouter.delete('/send', deleteMessage)
+contactRouter.delete('/delete/:id', deleteMessage)
 
 export default contactRouter;
