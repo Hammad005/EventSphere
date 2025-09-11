@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Info, UserRoundPlus } from "lucide-react";
+import { Eye, EyeOff, Info, Loader2, UserRoundPlus } from "lucide-react";
 import React, { useRef, useState } from "react";
 import {
   Select,
@@ -20,8 +20,10 @@ import {
 import gsap from "gsap";
 import { useNavigate } from "react-router-dom";
 import { useGSAP } from "@gsap/react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const Signup = () => {
+  const {signup, userLoading} = useAuthStore(); 
   const cardRef = useRef(null);
   const [data, setData] = useState({
     name: "",
@@ -62,18 +64,18 @@ const Signup = () => {
       newError.password = "Password is required";
     } else if (data.password.length < 6) {
       newError.password = "Password must be at least 6 characters long";
-    } else if (data.password !== confirmPass) {
-      newError.password = "Passwords do not match";
     }
 
     if (!confirmPass) {
       newError.confirmPass = "Confirm Password is required";
+    }else if (data.password !== confirmPass) {
+      newError.confirmPass = "Passwords do not match";
     }
 
     setError(newError);
 
     if (Object.keys(newError).length === 0) {
-      // Handle form submission
+      signup(data);
     }
   };
 
@@ -297,8 +299,10 @@ const Signup = () => {
                 )}
               </div>
 
-              <Button type="submit" className={"w-full mt-3"}>
-                Signup
+              <Button type="submit" className={"w-full mt-3"} disabled={userLoading}>
+                {
+                  userLoading ? <Loader2 className="animate-spin" /> : "Signup"
+                }
               </Button>
 
               <p className="text-xs text-center">

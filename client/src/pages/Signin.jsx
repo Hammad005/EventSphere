@@ -8,13 +8,15 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Info, LogIn } from "lucide-react";
+import { Eye, EyeOff, Info, Loader2, LogIn } from "lucide-react";
 import React, { useRef, useState } from "react";
 import gsap from "gsap";
 import { useNavigate } from "react-router-dom";
 import { useGSAP } from "@gsap/react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const Signin = () => {
+  const {signin, userLoading} = useAuthStore();
   const cardRef = useRef(null);
   const [data, setData] = useState({
     email: "",
@@ -40,7 +42,7 @@ const Signin = () => {
     setError(newError);
 
     if (Object.keys(newError).length === 0) {
-      // Handle form submission
+      signin(data);
     }
   };
 
@@ -132,8 +134,10 @@ const Signin = () => {
 
               
 
-              <Button type="submit" className={"w-full mt-3"}>
-                Signin
+              <Button type="submit" className={"w-full mt-3"} disabled={userLoading}>
+                {
+                  userLoading ? <Loader2 className="animate-spin" /> : "Signin"
+                }
               </Button>
 
               <p className="text-xs text-center">

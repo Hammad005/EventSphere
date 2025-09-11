@@ -19,27 +19,21 @@ export const signup = async (req, res) => {
                 error: "Email already in use",
             });
         };
-
-        const user = await User.create({
-            name,
-            email,
-            password,
-            enrollmentNumber,
-            role,
-            phone,
-            department,
-        });
-
         const generateEnrollmentNumber = (departmentCode) => {
             const year = new Date().getFullYear();
             const random = Math.floor(10000 + Math.random() * 90000); // 5-digit random number
             return `${departmentCode.slice(0, 3).toUpperCase()}-${year}-${random}`;
         };
-        if (role === "participant") {
-            generateEnrollmentNumber(department);
-            user.enrollmentNumber = generateEnrollmentNumber(department);
-            await user.save();
-        }
+
+        const user = await User.create({
+            name,
+            email,
+            password,
+            role,
+            enrollmentNumber: role === "participant" && generateEnrollmentNumber(department),
+            phone,
+            department,
+        });
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
             expiresIn: "2d"

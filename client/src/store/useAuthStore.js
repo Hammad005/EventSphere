@@ -11,7 +11,7 @@ export const useAuthStore = create((set) => ({
         set({ userLoading: true });
         try {
             const res = await axios.post("/auth/signup", data);
-            set({ user: res.data, userLoading: false });
+            set({ user: res.data?.user, userLoading: false });
         } catch (error) {
             toast.error(error.response.data.error);
             set({ userLoading: false, user: null });
@@ -20,13 +20,13 @@ export const useAuthStore = create((set) => ({
         }
     },
     signin: async (data) => {
-        set({ authLoading: true });
+        set({ userLoading: true });
         try {
             const res = await axios.post("/auth/login", data);
-            set({ user: res.data, authLoading: false });
+            set({ user: res.data?.user, userLoading: false });
         } catch (error) {
             toast.error(error.response.data.error);
-            set({ authLoading: false, user: null });
+            set({ userLoading: false, user: null });
             console.log(error);
         }
     },
