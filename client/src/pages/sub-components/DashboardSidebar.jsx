@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import { CalendarRange, Gauge, Loader2, LogOut, UserRound, UsersRound } from "lucide-react";
+import { BellRing, CalendarRange, Gauge, Loader2, LogOut, MessageSquare, UserRound, UsersRound } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
 
@@ -9,10 +9,10 @@ const DashboardSidebar = () => {
   const { userLoading, signout } = useAuthStore();
   const location = useLocation();
   return (
-    <aside className="flex flex-col justify-between md:gap-8 dark:bg-secondary bg-zinc-100 border-r dark:border-black border-zinc-300 h-screen sticky top-0 w-full md:p-4">
+    <aside className="flex flex-col justify-between lg:gap-8 dark:bg-secondary bg-zinc-100 border-r dark:border-black border-zinc-300 h-screen sticky top-0 w-full md:p-4">
       <div className="w-full lg:p-0 p-2 ">
         <Link to={"/"} className="flex flex-col items-center gap-2 w-full">
-          <div className="p-2 rounded-md bg-black w-12 h-12 object-contain flex justify-center animate-bounce">
+          <div className="p-2 rounded-md bg-black w-12 h-12 object-contain flex justify-center md:animate-bounce">
             <img
               src={logo}
               alt=" logo"
@@ -38,42 +38,62 @@ const DashboardSidebar = () => {
       >
         <Button
           asChild
-          className={"w-full md:justify-between"}
+          className={"w-full lg:justify-between"}
           variant={location.pathname === "/dashboard" ? "default" : "outline"}
         >
           <Link to={"/dashboard"}>
             <Gauge />
-            <span className="md:inline hidden">Dashboard</span>
+            <span className="lg:inline hidden">Dashboard</span>
           </Link>
         </Button>
         <Button
           asChild
-          className={"w-full md:justify-between"}
+          className={"w-full lg:justify-between"}
           variant={location.pathname === "/manage-Events" ? "default" : "outline"}
         >
           <Link to={"/manage-Events"}>
             <CalendarRange />
-            <span className="md:inline hidden">Manage Events</span>
+            <span className="lg:inline hidden">Manage Events</span>
           </Link>
         </Button>
         <Button
           asChild
-          className={"w-full md:justify-between"}
+          className={"w-full lg:justify-between"}
+          variant={location.pathname === "/notifications" ? "default" : "outline"}
+        >
+          <Link to={"/notifications"}>
+            <BellRing />
+            <span className="lg:inline hidden">Notifications</span>
+          </Link>
+        </Button>
+        <Button
+          asChild
+          className={"w-full lg:justify-between"}
           variant={location.pathname === "/manage-Users" ? "default" : "outline"}
         >
           <Link to={"/manage-Users"}>
             <UsersRound />
-            <span className="md:inline hidden">Manage Users</span>
+            <span className="lg:inline hidden">Manage Users</span>
           </Link>
         </Button>
         <Button
           asChild
-          className={"w-full md:justify-between"}
+          className={"w-full lg:justify-between"}
+          variant={location.pathname === "/messages" ? "default" : "outline"}
+        >
+          <Link to={"/messages"}>
+            <MessageSquare />
+            <span className="lg:inline hidden">Messages</span>
+          </Link>
+        </Button>
+        <Button
+          asChild
+          className={"w-full lg:justify-between"}
           variant={location.pathname === "/profile" ? "default" : "outline"}
         >
           <Link to={"/profile"}>
             <UserRound />
-            <span className="md:inline hidden">My Profile</span>
+            <span className="lg:inline hidden">My Profile</span>
           </Link>
         </Button>
       </div>
