@@ -30,7 +30,7 @@ export const signup = async (req, res) => {
             email,
             password,
             role,
-            enrollmentNumber: role === "participant" && generateEnrollmentNumber(department),
+            enrollmentNumber: role === "participant" ? generateEnrollmentNumber(department) : null,
             phone,
             department,
         });

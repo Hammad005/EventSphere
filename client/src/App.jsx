@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
@@ -13,7 +13,12 @@ const protectedRoutes = (condition, children, navigate) => {
   return condition ? children : <Navigate to={navigate} />
 };
 const App = () => {
-  const {authLoading, user} = useAuthStore();
+  const {authLoading, user, checkAuth} = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth])
+  
 
   if (authLoading) return <Loading/>
   return (
