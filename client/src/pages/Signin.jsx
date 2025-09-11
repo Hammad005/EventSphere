@@ -71,7 +71,7 @@ const Signin = () => {
   };
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-75px)] w-full md:px-0 p-6">
-      <Card className={"md:w-1/2 w-full"} ref={cardRef}>
+      <Card className={"md:w-1/2 w-full h-96 flex justify-center"} ref={cardRef}>
         <CardHeader>
           <CardTitle className={"flex items-center gap-2"}>
             <LogIn className="size-5" />
