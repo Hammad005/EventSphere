@@ -7,7 +7,7 @@ const ModeToggle = () => {
   const { theme, setTheme } = useTheme();
   return (
     <Button
-      variant="secondary"
+      variant="outline"
       size={"icon"}
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
     >
