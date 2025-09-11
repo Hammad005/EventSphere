@@ -47,7 +47,7 @@ const Contact = () => {
   return (
     <div className="flex flex-col justify-between dark:bg-black bg-secondary lg:min-h-[calc(100vh-75px)] sticky top-[75px] w-full p-4">
       <div className="mt-4 flex flex-col gap-8">
-        <h1 className="text-4xl font-serif">
+        <h1 className="xl:text-4xl lg:text-3xl font-serif">
           <Typewriter
             words={["Any Questions ?"]}
             loop={0}
@@ -57,7 +57,7 @@ const Contact = () => {
             delaySpeed={1000}
           />
         </h1>
-        <form className="flex flex-col gap-4" onSubmit={handleSendMessage}>
+        <form className="flex flex-col gap-3" onSubmit={handleSendMessage}>
           <div className="flex flex-col gap-1">
             <Input
               type={"text"}

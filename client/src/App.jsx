@@ -8,6 +8,7 @@ import Signup from './pages/Signup';
 import { Toaster } from 'sonner'
 import { useAuthStore } from './store/useAuthStore';
 import Loading from './components/Loading';
+import DashBoardLayout from './layout/DashBoardLayout';
 
 const protectedRoutes = (condition, children, navigate) => {
   return condition ? children : <Navigate to={navigate} />
@@ -24,9 +25,12 @@ const App = () => {
   return (
     <>
     <Routes>
+      <Route element={<DashBoardLayout/>}>
       <Route path='/dashboard' element={
         protectedRoutes(user, <Dashboard/>, "/signin")
       }/>
+
+      </Route>
 
       <Route element={<PageLayout/>}>
       <Route path='/' element={<Home/>}/>
