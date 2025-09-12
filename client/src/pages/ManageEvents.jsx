@@ -12,158 +12,155 @@ import {
 } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { UserPlus2 } from "lucide-react";
+import { CalendarPlus, Edit, Eye, Trash2, UserPlus2 } from "lucide-react";
 import CreateEvent from "./sub-components/CreateEvent";
+import { useEventStore } from "@/store/useEventStore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const ManageEvents = () => {
-  const { allUsers, switchActivation, switchActivationLoading } =
-    useAuthStore();
+  const { events } = useEventStore();
+  const { user, allUsers } = useAuthStore();
 
-  const [change, setChange] = useState(true);
+  const [change, setChange] = useState(false);
 
-  const totalOraganizers = allUsers.filter((user) => user.role === "organizer");
-  const totalParticipants = allUsers.filter(
-    (user) => user.role === "participant"
-  );
+  // Group filters in one place
+  const eventGroups = {
+    upcoming: events.filter((e) => e.status === "upcoming" && e.approved),
+    ongoing: events.filter((e) => e.status === "ongoing" && e.approved),
+    completed: events.filter((e) => e.status === "completed" && e.approved),
+    cancelled: events.filter((e) => e.status === "cancelled" && e.approved),
+  };
+
+  // Store just the key
+  const [filterEvents, setFilterEvents] = useState("upcoming");
+
+  const displayedEvents = eventGroups[filterEvents];
+
+  const labels = {
+    upcoming: "Upcoming Events",
+    ongoing: "Ongoing Events",
+    completed: "Completed Events",
+    cancelled: "Cancelled Events",
+  };
 
   return (
-    <>
-      <div className="flex flex-col justify-center items-center min-h-[calc(100vh-80px)] w-full">
-        {!change ? (
-          <>
-            <div className="grid md:grid-cols-2 grid-cols-1 gap-8 w-full mt-5">
-              <Card className={"w-full"}>
+    <div className="flex flex-col items-center min-h-[calc(100vh-80px)] w-full">
+      {!change ? (
+        <>
+          {/* Create Button */}
+          <div className="flex justify-end w-full mt-5">
+            <Button onClick={() => setChange(true)} variant={"secondary"}>
+              <CalendarPlus /> Create Events
+            </Button>
+          </div>
+
+          {/* Stat Cards */}
+          <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-8 w-full mt-5">
+            {Object.entries(eventGroups).map(([key, arr]) => (
+              <Card key={key} className="w-full">
                 <CardHeader>
-                  <CardTitle className="text-2xl  font-bold font-serif">
-                    Total Organizers
+                  <CardTitle className="text-2xl font-bold font-serif">
+                    Total {labels[key]}
                   </CardTitle>
                 </CardHeader>
-                <CardContent
-                  className={
-                    "text-9xl text-end text-transparent [-webkit-text-stroke:1px_var(--foreground)] font-bold"
-                  }
-                >
-                  {totalOraganizers.length}
+                <CardContent className="text-8xl text-end text-transparent [-webkit-text-stroke:1px_var(--foreground)] font-bold">
+                  {arr.length}
                 </CardContent>
               </Card>
-              <Card className={"w-full"}>
-                <CardHeader>
-                  <CardTitle className="text-2xl  font-bold font-serif">
-                    Total Participants
-                  </CardTitle>
-                </CardHeader>
-                <CardContent
-                  className={
-                    "text-9xl text-end text-transparent [-webkit-text-stroke:1px_var(--foreground)] font-bold"
-                  }
-                >
-                  {totalParticipants.length}
-                </CardContent>
-              </Card>
-            </div>
+            ))}
+          </div>
 
-            <div className="grid md:grid-cols-2 grid-cols-1 gap-8 w-full mt-5">
-              <div className="flex flex-col gap-2 w-full">
-                <div className="flex md:flex-row flex-col md:items-center justify-between mb-2 gap-2">
-                  <h2 className="text-3xl font-bold">All Organizers</h2>
-                  <Button onClick={() => setChange(true)}>
-                    <UserPlus2 />
-                    Add Organizers
-                  </Button>
-                </div>
-                <div className="overflow-hidden rounded-md border w-full">
-                  <Table>
-                    <TableHeader className="bg-secondary">
-                      <TableRow>
-                        <TableHead>Is-Active</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Phone</TableHead>
-                        <TableHead>Department</TableHead>
-                        <TableHead>Managed Events</TableHead>
+          {/* Title + Filter */}
+          <div className="flex items-center justify-between w-full my-5">
+            <h2 className="text-3xl font-bold w-full">
+              {labels[filterEvents]}
+            </h2>
+            <Select value={filterEvents} onValueChange={setFilterEvents}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Event Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="upcoming">Upcoming Events</SelectItem>
+                <SelectItem value="ongoing">Ongoing Events</SelectItem>
+                <SelectItem value="completed">Completed Events</SelectItem>
+                <SelectItem value="cancelled">Cancelled Events</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Table */}
+          <div className="flex flex-col gap-2 w-full">
+            <div className="overflow-hidden rounded-md border w-full">
+              <Table>
+                <TableHeader className="bg-secondary">
+                  <TableRow>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Start Date</TableHead>
+                    <TableHead>End Date</TableHead>
+                    <TableHead>Fee</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Organizer</TableHead>
+                    <TableHead>Total Participants</TableHead>
+                    <TableHead className={"text-center"}>Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {displayedEvents?.map((event) => {
+                    const organizer =
+                      event.organizer.toString() === user._id.toString()
+                        ? user.name
+                        : allUsers.find(
+                            (r) => r._id.toString() === event.organizer.toString()
+                          )?.name;
+
+                    return (
+                      <TableRow key={event._id}>
+                        <TableCell>{event.title}</TableCell>
+                        <TableCell>{event.category}</TableCell>
+                        <TableCell>
+                          {new Date(event.startDate).toLocaleString()}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(event.endDate).toLocaleString()}
+                        </TableCell>
+                        <TableCell>{event.fee}</TableCell>
+                        <TableCell>{event.status}</TableCell>
+                        <TableCell>{organizer}</TableCell>
+                        <TableCell className="text-center">
+                          {event.participants.length}
+                        </TableCell>
+                        <TableCell className={"flex gap-3"}>
+                          <Button size={"icon"}>
+                            <Eye />
+                          </Button>
+                          <Button size={"icon"} variant={"outline"}>
+                            <Edit />
+                          </Button>
+                          <Button size={"icon"} variant={"destructive"}>
+                            <Trash2 />
+                          </Button>
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {totalOraganizers?.map((user) => {
-                        const userIsActive = user.isActive;
-                        return (
-                          <TableRow>
-                            <TableCell>
-                              <Switch
-                                checked={userIsActive}
-                                onCheckedChange={() =>
-                                  switchActivation(user._id)
-                                }
-                                disabled={switchActivationLoading}
-                              />
-                            </TableCell>
-                            <TableCell>{user.name}</TableCell>
-                            <TableCell>{user.email}</TableCell>
-                            <TableCell>{user.phone}</TableCell>
-                            <TableCell>{user.department}</TableCell>
-                            <TableCell>{user.managedEvents.length}</TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-
-
-              <div className="flex flex-col gap-2 w-full">
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-3xl font-bold">All Participants</h2>
-                </div>
-                <div className="overflow-hidden rounded-md border w-full">
-                  <Table>
-                    <TableHeader className="bg-secondary">
-                      <TableRow>
-                        <TableHead>Is-Active</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Enrollment Number</TableHead>
-                        <TableHead>Phone</TableHead>
-                        <TableHead>Department</TableHead>
-                        <TableHead>Registered Events</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {totalParticipants?.map((user) => {
-                        const userIsActive = user.isActive;
-                        return (
-                          <TableRow>
-                            <TableCell>
-                              <Switch
-                                checked={userIsActive}
-                                onCheckedChange={() =>
-                                  switchActivation(user._id)
-                                }
-                                disabled={switchActivationLoading}
-                              />
-                            </TableCell>
-                            <TableCell>{user.name}</TableCell>
-                            <TableCell>{user.email}</TableCell>
-                            <TableCell>{user.enrollmentNumber}</TableCell>
-                            <TableCell>{user.phone}</TableCell>
-                            <TableCell>{user.department}</TableCell>
-                            <TableCell>{user.registeredEvents.length}</TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-              
+                    );
+                  })}
+                </TableBody>
+              </Table>
             </div>
-          </>
-        ) : (
-          <CreateEvent setChange={setChange} />
-        )}
-      </div>
-    </>
+          </div>
+        </>
+      ) : (
+        <CreateEvent setChange={setChange} />
+      )}
+    </div>
   );
 };
+
 
 export default ManageEvents;

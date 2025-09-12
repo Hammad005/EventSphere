@@ -10,20 +10,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useAuthStore } from "@/store/useAuthStore";
+import { useEventStore } from "@/store/useEventStore";
 import {
   ArrowLeft,
   CalendarPlus,
   Info,
   Loader2,
   Upload,
-  UserPlus2,
+  X,
 } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { toast } from "sonner";
 
 const CreateEvent = ({ setChange }) => {
-  const { createOrganizer, createOrganizerLoading } = useAuthStore();
+  const {createEvent, eventLoading} = useEventStore();
   const fileRef = useRef(null);
 
   const [data, setData] = useState({
@@ -123,7 +123,7 @@ const CreateEvent = ({ setChange }) => {
     setError(newError);
 
     if (Object.keys(newError).length === 0) {
-      const res = await createOrganizer(data);
+      const res = await createEvent(data);
       if (res?.success) {
         setData({
           title: "",
@@ -304,7 +304,7 @@ const CreateEvent = ({ setChange }) => {
               <div className="flex flex-col gap-1">
                 <Label htmlFor="startDate">Start Date</Label>
                 <Input
-                  type={"date"}
+                  type={"datetime-local"}
                   placeholder="Enter event start date"
                   value={data.startDate}
                   onChange={(e) =>
@@ -321,7 +321,7 @@ const CreateEvent = ({ setChange }) => {
               <div className="flex flex-col gap-1">
                 <Label htmlFor="endDate">End Date</Label>
                 <Input
-                  type={"date"}
+                  type={"datetime-local"}
                   placeholder="Enter event end date"
                   value={data.endDate}
                   onChange={(e) =>
@@ -364,9 +364,9 @@ const CreateEvent = ({ setChange }) => {
                 />
               </div>
 
-              <div className="flex justify-between gap-1 w-full">
+              <div className="flex items-start justify-between gap-1 w-full mt-2">
                 <Label htmlFor="eventMedia">Event Media:</Label>
-                <input type="file" className="hidden" ref={fileRef} onChange={handleImage}/>
+                <input type="file" className="hidden" ref={fileRef} onChange={handleImage} multiple/>
                 <Button
                   type={"button"}
                   className={"w-1/2"}
@@ -377,16 +377,30 @@ const CreateEvent = ({ setChange }) => {
                   Upload
                 </Button>
               </div>
+              <div className="grid md:grid-cols-3 grid-cols-2 gap-4">
+                {data.medias?.map((media, i) => (
+                  <div key={i} className="w-full h-25 rounded-md relative">
+                    <Button size={"icon"} variant={"outline"} className={"absolute right-0"} onClick={() => setData((prev) => ({
+                      ...prev,
+                      medias: prev.medias.filter((_, idx) => idx !== i),
+                    }))}><X/></Button>
+                    <img src={media} alt="image" className="w-full h-full object-cover overflow-hidden rounded-md"/>
+                  </div>
+                ))}
+              </div>
 
               <Button
                 type="submit"
                 className={"w-full mt-3"}
-                disabled={createOrganizerLoading}
+
+                disabled={eventLoading}
               >
-                {createOrganizerLoading ? (
+                {eventLoading ? (
+                  <>
                   <Loader2 className="animate-spin" />
+                  </>
                 ) : (
-                  "Add"
+                  "Create"
                 )}
               </Button>
             </form>

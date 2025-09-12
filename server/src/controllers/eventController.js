@@ -1,4 +1,4 @@
-import cloudinary from "../lib/Cloudinary.js";
+import cloudinary from "../lib/cloudinary.js";
 import Event from "../models/Event.js";
 import User from "../models/User.js";
 
@@ -166,7 +166,7 @@ export const cancelEvent = async (req, res) => {
 
 export const allEvents = async (req, res) => {
     try {
-        const events = Event.find({});
+        const events = await Event.find({});
         res.status(200).json({ events });
     } catch (error) {
         console.log(error);
