@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuthStore } from "@/store/useAuthStore";
 import React, { useState } from "react";
-import AddOrganizers from "./sub-components/AddOrganizers";
 import {
   Table,
   TableBody,
@@ -10,9 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { CalendarPlus, Edit, Eye, Trash2, UserPlus2 } from "lucide-react";
+import { CalendarPlus, Check, Edit, Eye, Trash2, UserPlus2, X } from "lucide-react";
 import CreateEvent from "./sub-components/CreateEvent";
 import { useEventStore } from "@/store/useEventStore";
 import {
@@ -22,13 +20,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import DeleteEvent from "@/components/DeleteEvent";
 
 const ManageEvents = () => {
-  const { events } = useEventStore();
+  const events = useEventStore((state) => state.events);
   const { user, allUsers } = useAuthStore();
 
   const [change, setChange] = useState(false);
+  const [deleteEvent, setDeleteEvent] = useState(null);
 
+  const approveRequest = events.filter((e) => !e.approved);
   // Group filters in one place
   const eventGroups = {
     upcoming: events.filter((e) => e.status === "upcoming" && e.approved),
@@ -50,6 +51,8 @@ const ManageEvents = () => {
   };
 
   return (
+    <>
+    {deleteEvent && <DeleteEvent deleteEvent={deleteEvent} setDeleteEvent={setDeleteEvent}/>}
     <div className="flex flex-col items-center min-h-[calc(100vh-80px)] w-full">
       {!change ? (
         <>
@@ -79,6 +82,66 @@ const ManageEvents = () => {
           {/* Title + Filter */}
           <div className="flex items-center justify-between w-full my-5">
             <h2 className="text-3xl font-bold w-full">
+              New Events <span className="text-sm text-muted-foreground">(approving requests)</span>
+            </h2>
+          </div>
+
+          {/* Table */}
+          <div className="flex flex-col gap-2 w-full">
+            <div className="overflow-hidden rounded-md border w-full">
+              <Table>
+                <TableHeader className="bg-secondary">
+                  <TableRow>
+                    <TableHead>Approved</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Start Date</TableHead>
+                    <TableHead>End Date</TableHead>
+                    <TableHead>Fee</TableHead>
+                    <TableHead>Organizer</TableHead>
+                    <TableHead className={"text-center"}>Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {approveRequest.length > 0 ? approveRequest?.map((event) => {
+                    const organizer =
+                      event.organizer.toString() === user._id.toString()
+                        ? user.name
+                        : allUsers.find(
+                            (r) => r._id.toString() === event.organizer.toString()
+                          )?.name;
+
+                    return (
+                      <TableRow key={event._id}>
+                        <TableCell>{event.approved ? <Check className="text-green-500"/> : <X className="text-red-500"/>}</TableCell>
+                        <TableCell>{event.title}</TableCell>
+                        <TableCell>{event.category}</TableCell>
+                        <TableCell>
+                          {new Date(event.startDate).toLocaleString()}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(event.endDate).toLocaleString()}
+                        </TableCell>
+                        <TableCell>{event.fee}</TableCell>
+                        <TableCell>{organizer}</TableCell>
+                        <TableCell className={"flex justify-center"}>
+                          <Button>
+                            <Check /> Approved
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }) : <TableCell className={'w-full'}>
+                    <p className="text-center p-2">No event requests</p>
+                    </TableCell>}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+
+
+          <div className="flex md:flex-row flex-col gap-2 items-center justify-between w-full my-5">
+            <h2 className="text-3xl font-bold w-full">
               {labels[filterEvents]}
             </h2>
             <Select value={filterEvents} onValueChange={setFilterEvents}>
@@ -100,6 +163,7 @@ const ManageEvents = () => {
               <Table>
                 <TableHeader className="bg-secondary">
                   <TableRow>
+                    <TableHead>Approved</TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Start Date</TableHead>
@@ -112,7 +176,7 @@ const ManageEvents = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {displayedEvents?.map((event) => {
+                  {displayedEvents?.length > 0 ? displayedEvents?.map((event) => {
                     const organizer =
                       event.organizer.toString() === user._id.toString()
                         ? user.name
@@ -122,6 +186,7 @@ const ManageEvents = () => {
 
                     return (
                       <TableRow key={event._id}>
+                        <TableCell>{event.approved ? <Check className="text-green-500"/> : <X className="text-red-500"/>}</TableCell>
                         <TableCell>{event.title}</TableCell>
                         <TableCell>{event.category}</TableCell>
                         <TableCell>
@@ -143,13 +208,17 @@ const ManageEvents = () => {
                           <Button size={"icon"} variant={"outline"}>
                             <Edit />
                           </Button>
-                          <Button size={"icon"} variant={"destructive"}>
+                          <Button size={"icon"} variant={"destructive"} onClick={() => {setDeleteEvent(event)}}>
                             <Trash2 />
                           </Button>
                         </TableCell>
                       </TableRow>
                     );
-                  })}
+                  }) : 
+                  <TableCell>
+                    <p className="text-center p-2">No Event found</p>
+                  </TableCell>
+                  }
                 </TableBody>
               </Table>
             </div>
@@ -159,6 +228,7 @@ const ManageEvents = () => {
         <CreateEvent setChange={setChange} />
       )}
     </div>
+    </>
   );
 };
 

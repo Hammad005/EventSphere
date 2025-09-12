@@ -77,7 +77,7 @@ export const approveEvent = async (req, res) => {
 };
 
 export const editEvent = async (req, res) => {
-    const { title, description, category, department, venue, startDate, endDate, registrationDeadline, fee, status } = req.body;
+    const { title, description, category, department, venue, startDate, endDate, registrationDeadline, fee } = req.body;
     const { id } = req.params;
     try {
         const event = await Event.findById(id);
@@ -97,8 +97,7 @@ export const editEvent = async (req, res) => {
             startDate,
             endDate,
             registrationDeadline,
-            fee,
-            status
+            fee
         }, { new: true });
 
         res.status(200).json({ message: "Event updated successfully", event: updatedEvent });
@@ -166,7 +165,7 @@ export const cancelEvent = async (req, res) => {
 
 export const allEvents = async (req, res) => {
     try {
-        const events = await Event.find({});
+        const events = await Event.find({}).sort({createdAt: -1});
         res.status(200).json({ events });
     } catch (error) {
         console.log(error);

@@ -5,6 +5,7 @@ import { create } from "zustand";
 export const useEventStore = create((set) => ({
     events: [],
     eventLoading: false,
+    updateEventLoading: false,
 
     getAllEvents: async () => {
         set({ eventLoading: true });
@@ -26,6 +27,41 @@ export const useEventStore = create((set) => ({
                 return { eventLoading: false };
             });
             toast.success("Event created successfully");
+        } catch (error) {
+            set({ eventLoading: false });
+            toast.error(error.response.data.error);
+            console.log(error);
+        }
+    },
+    removeEvent: async (id) => {
+        set({ eventLoading: true });
+        try {
+            await axios.delete(`/event/delete/${id}`);
+            set((state) => ({
+                events: state.events.filter((event) => event._id !== id),
+                eventLoading: false,
+            }));
+            toast.success("Event deleted successfully");
+            return { success: true };
+        } catch (error) {
+            set({ eventLoading: false });
+            toast.error(error.response.data.error);
+            console.log(error);
+        }
+    },
+    updateEvent: async (data) => {
+        set({ updateEventLoading: true });
+        try {
+            const res = await axios.put(`/event/edit/${data._id}`, data);
+            set((state) => {
+                const updatedEvents = state.events.map((event) => {
+                    if (event._id === data._id) {
+                        return res.data.event;
+                    }
+                    return event;
+                });
+                return { events: updatedEvents, updateEventLoading: false };
+            })
         } catch (error) {
             set({ eventLoading: false });
             toast.error(error.response.data.error);
