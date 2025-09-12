@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,13 +15,21 @@ const Profile = () => {
   });
   return (
     <>
-      <div className="flex items-center justify-center min-h-[70vh]">
+      <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
         <Card className={"md:w-1/2"}>
           <CardHeader>
-            <CardTitle className={'text-xl font-serif'}>My Profile Info</CardTitle>
+            <CardTitle className={'text-xl font-serif relative'}>
+              <span>{!updateUserLoading ? "My" : "Updating"} </span>
+              Profile Info
+
+              {user?.enrollmentNumber &&<span className="text-xs text-muted-foreground font-sans absolute top-2 right-0 border-2 p-2">
+              <span className="font-bold">Er No: </span>
+              {user?.enrollmentNumber}
+            </span>}
+            </CardTitle>
           </CardHeader>
         <CardContent>
-          <form className="grid md:grid-cols-2 gap-3">
+          <form className="grid grid-cols-1 gap-3">
             <div className="flex flex-col gap-2">
               <Label htmlFor="name">Name</Label>
               <Input
@@ -55,12 +63,15 @@ const Profile = () => {
                 onBlur={() => updateUser(data)}
               />
             </div>
-            <div className="flex flex-col gap-2">
+            {data.department && <div className="flex flex-col gap-2">
               <Label htmlFor="department">Department</Label>
               <Select
                 disabled={updateUserLoading}
-                defaultValue={data.department}
-                onValueChange={(e) => setData({ ...data, department: e }) && updateUser(data)}
+                value={data.department}
+                onValueChange={(e) => {
+                  setData({ ...data, department: e })
+                  updateUser(data)
+                }}
               >
                     <SelectTrigger className={"w-full"}>
                       <SelectValue placeholder="Select a department" />
@@ -116,7 +127,7 @@ const Profile = () => {
                       </SelectItem>
                     </SelectContent>
                   </Select>
-            </div>
+            </div>}
           </form>
         </CardContent>
         </Card>
