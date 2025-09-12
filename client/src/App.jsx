@@ -15,6 +15,7 @@ import ManageUser from "./pages/ManageUser";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import { useChatStore } from "./store/useChatStore";
+import { useEventStore } from "./store/useEventStore";
 
 const protectedRoutes = (condition, children, navigate) => {
   return condition ? children : <Navigate to={navigate} />;
@@ -22,10 +23,12 @@ const protectedRoutes = (condition, children, navigate) => {
 const App = () => {
   const { authLoading, user, checkAuth, getAllUsers } = useAuthStore();
   const { getMessages } = useChatStore();
+  const { getAllEvents } = useEventStore();
 
   useEffect(() => {
     checkAuth();
-  }, [checkAuth]);
+    getAllEvents();
+  }, [checkAuth, getAllEvents]);
 
   useEffect(() => {
     if (user?.role === "admin") {
@@ -33,7 +36,6 @@ const App = () => {
       getAllUsers();
     }
   }, [getMessages, user?.role, getAllUsers]);
-  
 
   if (authLoading) return <Loading />;
   return (

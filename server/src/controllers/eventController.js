@@ -3,7 +3,7 @@ import Event from "../models/Event.js";
 import User from "../models/User.js";
 
 export const createEvent = async (req, res) => {
-    const { title, description, category, department, venue, startDate, endDate, registrationDeadline, fee, status, medias } = req.body;
+    const { title, description, category, department, venue, startDate, endDate, registrationDeadline, fee, medias } = req.body;
     try {
         let uploadedMedia = [];
         if (medias && medias?.length > 0) {
@@ -22,6 +22,7 @@ export const createEvent = async (req, res) => {
                 });
             }
         }
+        
         const event = await Event.create({
             title,
             description,
@@ -32,9 +33,9 @@ export const createEvent = async (req, res) => {
             endDate,
             registrationDeadline,
             fee,
-            status,
             organizer: req.user?._id,
-            medias: uploadedMedia
+            medias: uploadedMedia,
+            approved: req.user?.role === "admin",
         });
 
         await User.updateOne({ _id: req.user?._id }, { $push: { managedEvents: event?._id } });

@@ -14,6 +14,7 @@ export const useAuthStore = create((set) => ({
 
     checkAuth: async () => {
       set({authLoading: true});
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       try {
         const res = await axios.get("/auth/me");
         set({ user: res.data, authLoading: false });
