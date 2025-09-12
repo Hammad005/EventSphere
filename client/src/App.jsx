@@ -14,16 +14,25 @@ import Notifications from "./pages/Notifications";
 import ManageUser from "./pages/ManageUser";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
+import { useChatStore } from "./store/useChatStore";
 
 const protectedRoutes = (condition, children, navigate) => {
   return condition ? children : <Navigate to={navigate} />;
 };
 const App = () => {
   const { authLoading, user, checkAuth } = useAuthStore();
+  const { getMessages } = useChatStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    if (user?.role === "admin") {
+      getMessages();
+    }
+  }, [getMessages, user?.role]);
+  
 
   if (authLoading) return <Loading />;
   return (
