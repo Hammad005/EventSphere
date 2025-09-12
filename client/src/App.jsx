@@ -16,6 +16,9 @@ import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import { useChatStore } from "./store/useChatStore";
 import { useEventStore } from "./store/useEventStore";
+import About from "./pages/About";
+import Events from "./pages/Events";
+import Gallery from "./pages/Gallery";
 
 const protectedRoutes = (condition, children, navigate) => {
   return condition ? children : <Navigate to={navigate} />;
@@ -70,6 +73,9 @@ const App = () => {
 
         <Route element={<PageLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/gallery" element={<Gallery />} />
           <Route
             path="/signin"
             element={protectedRoutes(!user, <Signin />, "/")}
