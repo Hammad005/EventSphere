@@ -57,6 +57,45 @@ export const signup = async (req, res) => {
     }
 };
 
+export const createOrganizer = async (req, res) => {
+    const { name, email, password, role, phone, department } = req.body;
+    try {
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                error: "Password must be at least 6 characters long",
+            })
+        };
+
+        const exisitingUser = await User.findOne({ email });
+
+        if (exisitingUser) {
+            return res.status(400).json({
+                success: false,
+                error: "Email already in use",
+            });
+        };
+
+        const user = await User.create({
+            name,
+            email,
+            password,
+            role,
+            phone,
+            department,
+        });
+
+        const userWithoutPassword = { ...user._doc }
+        delete userWithoutPassword.password
+
+        res.status(201).json({ user: userWithoutPassword })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message || "Internal Server Error" })
+    }
+};
+
 export const login = async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -66,7 +105,11 @@ export const login = async (req, res) => {
                 success: false,
                 error: "Invalid Credentials"
             })
-        };
+        } else if (!existingUser?.isActive) {
+                return res.status(403).json({
+                    error: "Your account has been deactivated by the administrator. Please contact support for further assistance."
+                });
+        }
 
         const isMatch = await existingUser.matchPassword(password);
         if (!isMatch) {
@@ -114,7 +157,7 @@ export const logout = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find({ role: { $ne: "admin" } }, "-password");
+        const users = await User.find({ role: { $ne: "admin" } }, "-password").sort({ createdAt: -1 });
         if (!users) {
             return res.status(404).json({ error: "User not found" });
         }
@@ -167,19 +210,26 @@ export const update = async (req, res) => {
 
 
 export const deactivate = async (req, res) => {
-    const { id } = req.params;
-    try {
-        if (req.user?.role !== "admin") {
-            return res.status(403).json({ error: "You are not eligible to deactivate this user" });
-        }
-
-        const user = await User.findById(id);
-        user.isActive === false ? user.isActive === true : user.isActive === false ;
-        await user.save();
-
-        res.status(200).json({ message: "User deactivated successfully" });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: error.message || "Internal Server Error" });
+  const { id } = req.params;
+  try {
+    if (req.user?.role !== "admin") {
+      return res.status(403).json({ error: "You are not eligible to deactivate this user" });
     }
-}
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.isActive = !user.isActive;
+    await user.save();
+
+    res.status(200).json({
+      message: `User ${user.isActive ? "activated" : "deactivated"} successfully`,
+      isActive: user.isActive, // optional but useful for frontend
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message || "Internal Server Error" });
+  }
+};

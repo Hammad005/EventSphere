@@ -274,7 +274,7 @@ const Signup = () => {
                   <Input
                     type={showCPass ? "text" : "password"}
                     placeholder="Enter your confirm password"
-                    value={data.confirmPass}
+                    value={confirmPass}
                     onChange={(e) => setConfirmPass(e.target.value)}
                   />
                   <div className="absolute mt-4.5 top-0 right-3 transform -translate-y-1/2 z-20">

@@ -11,9 +11,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { UserPlus2 } from "lucide-react";
 
 const ManageUser = () => {
-  const { allUsers } = useAuthStore();
+  const { allUsers, switchActivation, switchActivationLoading } =
+    useAuthStore();
 
   const [change, setChange] = useState(false);
 
@@ -24,10 +27,10 @@ const ManageUser = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center min-h-[calc(100vh-80px)] w-full">
+      <div className="flex flex-col justify-center items-center min-h-[calc(100vh-80px)] w-full">
         {!change ? (
           <>
-            <div className="flex md:flex-row flex-col items-center justify-between gap-8 w-full mt-5">
+            <div className="grid md:grid-cols-2 grid-cols-1 gap-8 w-full mt-5">
               <Card className={"w-full"}>
                 <CardHeader>
                   <CardTitle className="text-2xl  font-bold font-serif">
@@ -58,44 +61,100 @@ const ManageUser = () => {
               </Card>
             </div>
 
-            <div className="flex md:flex-row flex-col items-center justify-between gap-8 w-full mt-5">
+            <div className="grid md:grid-cols-2 grid-cols-1 gap-8 w-full mt-5">
               <div className="flex flex-col gap-2 w-full">
-              <h2 className="text-3xl font-bold">All Organizers</h2>
-              <div className="overflow-hidden rounded-2xl border w-full">
-                <Table>
-                  <TableHeader className="bg-secondary">
-                    <TableRow>
-                      <TableHead>Is-Active</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Phone</TableHead>
-                      <TableHead>Department</TableHead>
-                      <TableHead>Managed Events</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {totalOraganizers?.map((user) => {
-                      const userIsActive = user.isActive;
-                      return (
-                    <TableRow>
-                      <TableCell>
-                        <Switch 
-                        checked={userIsActive}
-                        onCheckedChange={(c) => console.log(c)
-                        }
-                        />
-                      </TableCell>
-                      <TableCell>{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.phone}</TableCell>
-                      <TableCell>{user.department}</TableCell>
-                      <TableCell>{user.managedEvents.length}</TableCell>
-                    </TableRow>
-                    )})}
-                  </TableBody>
-                </Table>
+                <div className="flex md:flex-row flex-col md:items-center justify-between mb-2 gap-2">
+                  <h2 className="text-3xl font-bold">All Organizers</h2>
+                  <Button onClick={() => setChange(true)}>
+                    <UserPlus2 />
+                    Add Organizers
+                  </Button>
+                </div>
+                <div className="overflow-hidden rounded-md border w-full">
+                  <Table>
+                    <TableHeader className="bg-secondary">
+                      <TableRow>
+                        <TableHead>Is-Active</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Phone</TableHead>
+                        <TableHead>Department</TableHead>
+                        <TableHead>Managed Events</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {totalOraganizers?.map((user) => {
+                        const userIsActive = user.isActive;
+                        return (
+                          <TableRow>
+                            <TableCell>
+                              <Switch
+                                checked={userIsActive}
+                                onCheckedChange={() =>
+                                  switchActivation(user._id)
+                                }
+                                disabled={switchActivationLoading}
+                              />
+                            </TableCell>
+                            <TableCell>{user.name}</TableCell>
+                            <TableCell>{user.email}</TableCell>
+                            <TableCell>{user.phone}</TableCell>
+                            <TableCell>{user.department}</TableCell>
+                            <TableCell>{user.managedEvents.length}</TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
+
+
+              <div className="flex flex-col gap-2 w-full">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-3xl font-bold">All Participants</h2>
+                </div>
+                <div className="overflow-hidden rounded-md border w-full">
+                  <Table>
+                    <TableHeader className="bg-secondary">
+                      <TableRow>
+                        <TableHead>Is-Active</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Enrollment Number</TableHead>
+                        <TableHead>Phone</TableHead>
+                        <TableHead>Department</TableHead>
+                        <TableHead>Registered Events</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {totalParticipants?.map((user) => {
+                        const userIsActive = user.isActive;
+                        return (
+                          <TableRow>
+                            <TableCell>
+                              <Switch
+                                checked={userIsActive}
+                                onCheckedChange={() =>
+                                  switchActivation(user._id)
+                                }
+                                disabled={switchActivationLoading}
+                              />
+                            </TableCell>
+                            <TableCell>{user.name}</TableCell>
+                            <TableCell>{user.email}</TableCell>
+                            <TableCell>{user.enrollmentNumber}</TableCell>
+                            <TableCell>{user.phone}</TableCell>
+                            <TableCell>{user.department}</TableCell>
+                            <TableCell>{user.registeredEvents.length}</TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
+              
             </div>
           </>
         ) : (

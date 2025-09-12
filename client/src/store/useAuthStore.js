@@ -8,6 +8,8 @@ export const useAuthStore = create((set) => ({
     userLoading: false,
     updateUserLoading: false,
     gettingUsersLoading: false,
+    switchActivationLoading: false,
+    createOrganizerLoading: false,
     authLoading: false,
 
     checkAuth: async () => {
@@ -47,7 +49,7 @@ export const useAuthStore = create((set) => ({
         set({ userLoading: true });
         try {
             await axios.post("/auth/logout");
-            set({ user: null, userLoading: false });
+            set({ user: null, allUsers: [], userLoading: false });
         } catch (error) {
             set({ userLoading: false });
             toast.error(error.response.data.error);
@@ -76,6 +78,44 @@ export const useAuthStore = create((set) => ({
             set({ gettingUsersLoading: false });
             toast.error(error.response.data.error);
             console.log(error);
+        }
+    },
+    switchActivation: async (id) => {
+      set({switchActivationLoading: true});
+
+      try {
+        const res = await axios.patch(`/auth/switchActivation/${id}`);
+        set((state) => {
+          const updatedUsers = state.allUsers.map((user) => {
+            if (user._id === id) {
+              return { ...user, isActive: !user.isActive };
+            }
+            return user;
+          });
+          return { allUsers: updatedUsers, switchActivationLoading: false };
+        });
+        toast.success(`${res.data.message}`);
+      } catch (error) {
+        set({ gettingUsersLoading: false });
+            toast.error(error.response.data.error);
+            console.log(error);
+      }
+    },
+    createOrganizer: async (data) => {
+        set({ createOrganizerLoading: true });
+        try {
+            const res = await axios.post("/auth/createOranizer", data);
+            set((state) => {
+                state.allUsers.push(res.data.user);
+                return { createOrganizerLoading: false };
+            });
+            toast.success("Organizer added successfully");
+            return {success: true};
+        } catch (error) {
+            toast.error(error.response.data.error);
+            set({ createOrganizerLoading: false });
+            console.log(error);
+            
         }
     }
 }));

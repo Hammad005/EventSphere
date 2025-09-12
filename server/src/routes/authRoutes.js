@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { deactivate, getAllUsers, login, logout, signup, update } from "../controllers/authController.js";
+import { createOrganizer, deactivate, getAllUsers, login, logout, signup, update } from "../controllers/authController.js";
 import { protectRoute } from "../middleware/protectRoute.js";
 
 const authRouter = Router();
 
 authRouter.post('/signup', signup);
+authRouter.post('/createOranizer', createOrganizer);
 authRouter.post('/login', login);
 authRouter.post('/logout', logout);
 
