@@ -22,7 +22,7 @@ export const createEvent = async (req, res) => {
                 });
             }
         }
-        
+
         const event = await Event.create({
             title,
             description,
@@ -66,9 +66,15 @@ export const approveEvent = async (req, res) => {
                 notifications: {
                     message: `New upcoming event "${event?.title}", last date of registration ${new Date(
                         event?.registrationDeadline
-                    ).toLocaleDateString()}. Register now!`
+                    ).toLocaleString()}.`
                 }
             }
+        });
+
+        res.status(200).json({
+            message: "Event approved successfully", notification: `New upcoming event "${event?.title}", last date of registration ${new Date(
+                event?.registrationDeadline
+            ).toLocaleString()}.`
         });
     } catch (error) {
         console.log(error);
@@ -165,7 +171,7 @@ export const cancelEvent = async (req, res) => {
 
 export const allEvents = async (req, res) => {
     try {
-        const events = await Event.find({}).sort({createdAt: -1});
+        const events = await Event.find({}).sort({ createdAt: -1 });
         res.status(200).json({ events });
     } catch (error) {
         console.log(error);
@@ -257,7 +263,7 @@ export const eventAttended = async (req, res) => {
         };
         if (req.user?.role !== "admin" && event?.organizer !== req.user?._id) {
             return res.status(403).json({ error: "You are not eligible to mark user attendance" });
-        } else if(startDate > new Date() || endDate < new Date()) {
+        } else if (startDate > new Date() || endDate < new Date()) {
             return res.status(400).json({ error: "Event registration deadline has passed" });
         }
 

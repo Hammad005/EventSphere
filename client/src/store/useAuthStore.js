@@ -4,6 +4,7 @@ import { create } from "zustand";
 
 export const useAuthStore = create((set) => ({
     user: null,
+    userNotifications: [],
     allUsers: [],
     userLoading: false,
     updateUserLoading: false,
@@ -17,7 +18,7 @@ export const useAuthStore = create((set) => ({
       await new Promise((resolve) => setTimeout(resolve, 2000));
       try {
         const res = await axios.get("/auth/me");
-        set({ user: res.data, authLoading: false });
+        set({ user: res.data, userNotifications: res.data.notifications, authLoading: false });
       } catch (error) {
         console.log(error);
         set({user: null, authLoading: false});
@@ -27,7 +28,7 @@ export const useAuthStore = create((set) => ({
         set({ userLoading: true });
         try {
             const res = await axios.post("/auth/signup", data);
-            set({ user: res.data?.user, userLoading: false });
+            set({ user: res.data?.user, userNotifications: res.data?.user?.notifications, userLoading: false });
         } catch (error) {
             toast.error(error.response.data.error);
             set({ userLoading: false, user: null });
@@ -39,7 +40,7 @@ export const useAuthStore = create((set) => ({
         set({ userLoading: true });
         try {
             const res = await axios.post("/auth/login", data);
-            set({ user: res.data?.user, userLoading: false });
+            set({ user: res.data?.user, userNotifications: res.data?.user?.notifications, userLoading: false });
         } catch (error) {
             toast.error(error.response.data.error);
             set({ userLoading: false, user: null });
@@ -50,7 +51,7 @@ export const useAuthStore = create((set) => ({
         set({ userLoading: true });
         try {
             await axios.post("/auth/logout");
-            set({ user: null, allUsers: [], userLoading: false });
+            set({ user: null, allUsers: [], userNotifications: [], userLoading: false });
         } catch (error) {
             set({ userLoading: false });
             toast.error(error.response.data.error);
@@ -118,5 +119,5 @@ export const useAuthStore = create((set) => ({
             console.log(error);
             
         }
-    }
+    },
 }));

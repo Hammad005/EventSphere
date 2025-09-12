@@ -24,6 +24,9 @@ import DeleteEvent from "@/components/DeleteEvent";
 
 const ManageEvents = () => {
   const events = useEventStore((state) => state.events);
+  const approveEvent = useEventStore((state) => state.approveEvent);
+  const eventLoading = useEventStore((state) => state.eventLoading);
+
   const { user, allUsers } = useAuthStore();
 
   const [change, setChange] = useState(false);
@@ -64,15 +67,15 @@ const ManageEvents = () => {
           </div>
 
           {/* Stat Cards */}
-          <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-8 w-full mt-5">
+          <div className="grid md:grid-cols-2 grid-cols-1 gap-8 w-full mt-5">
             {Object.entries(eventGroups).map(([key, arr]) => (
               <Card key={key} className="w-full">
                 <CardHeader>
-                  <CardTitle className="text-2xl font-bold font-serif">
+                  <CardTitle className="text-xl font-bold font-serif">
                     Total {labels[key]}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-8xl text-end text-transparent [-webkit-text-stroke:1px_var(--foreground)] font-bold">
+                <CardContent className="text-7xl text-end text-transparent [-webkit-text-stroke:1px_var(--foreground)] font-bold">
                   {arr.length}
                 </CardContent>
               </Card>
@@ -105,10 +108,10 @@ const ManageEvents = () => {
                 <TableBody>
                   {approveRequest.length > 0 ? approveRequest?.map((event) => {
                     const organizer =
-                      event.organizer.toString() === user._id.toString()
+                      event.organizer === user._id
                         ? user.name
                         : allUsers.find(
-                            (r) => r._id.toString() === event.organizer.toString()
+                            (r) => r._id === event.organizer
                           )?.name;
 
                     return (
@@ -125,7 +128,7 @@ const ManageEvents = () => {
                         <TableCell>{event.fee}</TableCell>
                         <TableCell>{organizer}</TableCell>
                         <TableCell className={"flex justify-center"}>
-                          <Button>
+                          <Button type={"button"} onClick={() => approveEvent(event._id)} disabled={eventLoading}>
                             <Check /> Approved
                           </Button>
                         </TableCell>
@@ -178,10 +181,10 @@ const ManageEvents = () => {
                 <TableBody>
                   {displayedEvents?.length > 0 ? displayedEvents?.map((event) => {
                     const organizer =
-                      event.organizer.toString() === user._id.toString()
+                      event.organizer === user._id
                         ? user.name
                         : allUsers.find(
-                            (r) => r._id.toString() === event.organizer.toString()
+                            (r) => r._id === event.organizer
                           )?.name;
 
                     return (

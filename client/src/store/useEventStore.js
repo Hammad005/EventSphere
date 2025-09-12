@@ -1,6 +1,7 @@
 import axios from "@/lib/axios";
 import { toast } from "sonner";
 import { create } from "zustand";
+import { useAuthStore } from "./useAuthStore";
 
 export const useEventStore = create((set) => ({
     events: [],
@@ -27,6 +28,7 @@ export const useEventStore = create((set) => ({
                 return { eventLoading: false };
             });
             toast.success("Event created successfully");
+            return { success: true }
         } catch (error) {
             set({ eventLoading: false });
             toast.error(error.response.data.error);
@@ -62,6 +64,26 @@ export const useEventStore = create((set) => ({
                 });
                 return { events: updatedEvents, updateEventLoading: false };
             })
+        } catch (error) {
+            set({ eventLoading: false });
+            toast.error(error.response.data.error);
+            console.log(error);
+        }
+    },
+    approveEvent: async (id) => {
+        set({ eventLoading: true });
+        try {
+            const res = await axios.patch(`/event/approve/${id}`);
+            useAuthStore.setState((state) => ({
+                userNotifications: [res.data.notification, ...(state.userNotifications || [])]
+            }));
+            set((state) => ({
+                events: state.events.map((event) =>
+                    event._id === id ? { ...event, approved: true } : event
+                ),
+                eventLoading: false
+            }));
+            toast.success("Event approved successfully")
         } catch (error) {
             set({ eventLoading: false });
             toast.error(error.response.data.error);
