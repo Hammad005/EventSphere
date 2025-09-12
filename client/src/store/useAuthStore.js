@@ -4,8 +4,10 @@ import { create } from "zustand";
 
 export const useAuthStore = create((set) => ({
     user: null,
+    allUsers: [],
     userLoading: false,
     updateUserLoading: false,
+    gettingUsersLoading: false,
     authLoading: false,
 
     checkAuth: async () => {
@@ -60,6 +62,18 @@ export const useAuthStore = create((set) => ({
             toast.success("Updated successfully");
         } catch (error) {
             set({ updateUserLoading: false });
+            toast.error(error.response.data.error);
+            console.log(error);
+        }
+    },
+    
+    getAllUsers: async () => {
+        set({ gettingUsersLoading: true });
+        try {
+            const res = await axios.get("/auth/getAllUsers");
+            set({ gettingUsersLoading: false, allUsers: res.data.users });
+        } catch (error) {
+            set({ gettingUsersLoading: false });
             toast.error(error.response.data.error);
             console.log(error);
         }

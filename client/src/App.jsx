@@ -20,7 +20,7 @@ const protectedRoutes = (condition, children, navigate) => {
   return condition ? children : <Navigate to={navigate} />;
 };
 const App = () => {
-  const { authLoading, user, checkAuth } = useAuthStore();
+  const { authLoading, user, checkAuth, getAllUsers } = useAuthStore();
   const { getMessages } = useChatStore();
 
   useEffect(() => {
@@ -30,8 +30,9 @@ const App = () => {
   useEffect(() => {
     if (user?.role === "admin") {
       getMessages();
+      getAllUsers();
     }
-  }, [getMessages, user?.role]);
+  }, [getMessages, user?.role, getAllUsers]);
   
 
   if (authLoading) return <Loading />;

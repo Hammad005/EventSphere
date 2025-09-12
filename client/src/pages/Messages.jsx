@@ -19,7 +19,7 @@ const Messages = () => {
     deleteMessage(id);
   };
   return (
-    <div className="p-6 grid gap-4">
+    <div className="p-6 grid gap-4 min-h-[calc(100vh-80px)]">
       {messages?.map((message) => (
         <Card key={message._id} className="shadow-md rounded-2xl">
           <CardHeader>

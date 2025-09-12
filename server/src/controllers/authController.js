@@ -112,6 +112,19 @@ export const logout = async (req, res) => {
     }
 };
 
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find({ role: { $ne: "admin" } }, "-password");
+        if (!users) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        res.status(200).json({ users });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message || "Internal Server Error" });
+    }
+};
+
 export const update = async (req, res) => {
     const { name, email, phone, department } = req.body;
     try {
@@ -161,7 +174,7 @@ export const deactivate = async (req, res) => {
         }
 
         const user = await User.findById(id);
-        user.isActive = false
+        user.isActive === false ? user.isActive === true : user.isActive === false ;
         await user.save();
 
         res.status(200).json({ message: "User deactivated successfully" });
