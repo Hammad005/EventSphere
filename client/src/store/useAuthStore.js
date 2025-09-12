@@ -5,6 +5,7 @@ import { create } from "zustand";
 export const useAuthStore = create((set) => ({
     user: null,
     userLoading: false,
+    updateUserLoading: false,
     authLoading: false,
 
     checkAuth: async () => {
@@ -51,4 +52,16 @@ export const useAuthStore = create((set) => ({
             console.log(error);
         }
     },
+    updateUser: async (data) => {
+        set({updateUserLoading: true});
+        try {
+            const res = await axios.put('/auth/update', data);
+            set({user: res.data?.user, updateUserLoading: false});
+            toast.success("Updated successfully");
+        } catch (error) {
+            set({ updateUserLoading: false });
+            toast.error(error.response.data.error);
+            console.log(error);
+        }
+    }
 }));

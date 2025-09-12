@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import { BellRing, CalendarRange, Gauge, Loader2, LogOut, MessageSquare, UserRound, UsersRound } from "lucide-react";
+import { BellRing, CalendarRange, Gauge, Loader2, LogOut, MessageSquare, User, UsersRound } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
 
@@ -92,7 +92,7 @@ const DashboardSidebar = () => {
           variant={location.pathname === "/profile" ? "default" : "outline"}
         >
           <Link to={"/profile"}>
-            <UserRound />
+            <User />
             <span className="lg:inline hidden">My Profile</span>
           </Link>
         </Button>

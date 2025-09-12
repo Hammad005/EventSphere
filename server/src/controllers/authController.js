@@ -115,6 +115,14 @@ export const logout = async (req, res) => {
 export const update = async (req, res) => {
     const { name, email, phone, department } = req.body;
     try {
+        for (const [key, value] of Object.entries({ name, email, phone })) {
+            if (!value) {
+                return res.status(400).json({ error: `${key} is required` });
+            }
+        }
+        if (!/\S+@\S+\.\S+/.test(email)) {
+            return res.status(400).json({ error: "Invalid email format" });
+        }
         if (email !== req.user.email) {
             const emailExist = await User.findOne({ email });
             if (emailExist) {
@@ -132,7 +140,7 @@ export const update = async (req, res) => {
             email,
             phone,
             department
-        }, {new: true});
+        }, { new: true });
 
         const userWithoutPassword = { ...updateUser._doc }
         delete userWithoutPassword.password
@@ -146,10 +154,10 @@ export const update = async (req, res) => {
 
 
 export const deactivate = async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
     try {
         if (req.user?.role !== "admin") {
-             return res.status(403).json({ error: "You are not eligible to deactivate this user" });
+            return res.status(403).json({ error: "You are not eligible to deactivate this user" });
         }
 
         const user = await User.findById(id);
