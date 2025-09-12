@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
 
 const DashboardSidebar = () => {
-  const { userLoading, signout } = useAuthStore();
+  const { userLoading, signout, user } = useAuthStore();
   const location = useLocation();
   return (
     <aside className="flex flex-col justify-between lg:gap-8 dark:bg-secondary bg-zinc-100 border-r dark:border-black border-zinc-300 h-screen sticky top-0 w-full md:p-4">
@@ -36,7 +36,7 @@ const DashboardSidebar = () => {
           "md:p-0 p-2 flex flex-col gap-6 w-full h-full"
         }
       >
-        <Button
+        {user?.role === "admin" && <Button
           asChild
           className={"w-full lg:justify-between"}
           variant={location.pathname === "/dashboard" ? "default" : "outline"}
@@ -45,7 +45,7 @@ const DashboardSidebar = () => {
             <Gauge />
             <span className="lg:inline hidden">Dashboard</span>
           </Link>
-        </Button>
+        </Button>}
         <Button
           asChild
           className={"w-full lg:justify-between"}
@@ -66,7 +66,7 @@ const DashboardSidebar = () => {
             <span className="lg:inline hidden">Notifications</span>
           </Link>
         </Button>
-        <Button
+        {user?.role === "admin" && <Button
           asChild
           className={"w-full lg:justify-between"}
           variant={location.pathname === "/manage-Users" ? "default" : "outline"}
@@ -75,8 +75,8 @@ const DashboardSidebar = () => {
             <UsersRound />
             <span className="lg:inline hidden">Manage Users</span>
           </Link>
-        </Button>
-        <Button
+        </Button>}
+        {user?.role === "admin" && <Button
           asChild
           className={"w-full lg:justify-between"}
           variant={location.pathname === "/messages" ? "default" : "outline"}
@@ -85,7 +85,7 @@ const DashboardSidebar = () => {
             <MessageSquare />
             <span className="lg:inline hidden">Messages</span>
           </Link>
-        </Button>
+        </Button>}
         <Button
           asChild
           className={"w-full lg:justify-between"}

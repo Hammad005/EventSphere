@@ -47,7 +47,7 @@ const App = () => {
         <Route element={<DashBoardLayout />}>
           <Route
             path="/dashboard"
-            element={protectedRoutes(user, <Dashboard />, "/signin")}
+            element={protectedRoutes(user && user.role === "admin", <Dashboard />, user && user.role !== "admin" ? "/manage-Events" : "/signin")}
           />
           <Route
             path="/manage-Events"
@@ -59,11 +59,11 @@ const App = () => {
           />
           <Route
             path="/manage-Users"
-            element={protectedRoutes(user, <ManageUser />, "/signin")}
+            element={protectedRoutes(user && user.role === "admin", <ManageUser />, user && user.role !== "admin" ? "/manage-Events" : "/signin")}
           />
           <Route
             path="/messages"
-            element={protectedRoutes(user, <Messages />, "/signin")}
+            element={protectedRoutes(user && user.role === "admin", <Messages />, user && user.role !== "admin" ? "/manage-Events" : "/signin")}
           />
           <Route
             path="/profile"

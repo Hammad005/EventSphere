@@ -51,19 +51,17 @@ export const useEventStore = create((set) => ({
             console.log(error);
         }
     },
-    updateEvent: async (data) => {
+    updateEvent: async (id, data) => {
         set({ updateEventLoading: true });
         try {
-            const res = await axios.put(`/event/edit/${data._id}`, data);
-            set((state) => {
-                const updatedEvents = state.events.map((event) => {
-                    if (event._id === data._id) {
-                        return res.data.event;
-                    }
-                    return event;
-                });
-                return { events: updatedEvents, updateEventLoading: false };
-            })
+            const res = await axios.put(`/event/edit/${id}`, data);
+            set((state) => ({
+                events: state.events.map((event) =>
+                    event._id === id ? { ...event, ...res.data.event } : event
+                ),
+                updateEventLoading: false
+            }))
+            toast.success("Event updated successfully");
         } catch (error) {
             set({ eventLoading: false });
             toast.error(error.response.data.error);

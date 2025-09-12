@@ -11,78 +11,42 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useEventStore } from "@/store/useEventStore";
-import {
-  ArrowLeft,
-  CalendarPlus,
-  Info,
-  Loader2,
-  Upload,
-  X,
-} from "lucide-react";
-import React, { useRef, useState } from "react";
-import { toast } from "sonner";
+import { ArrowLeft, CalendarCog, Info, Loader2 } from "lucide-react";
+import React, { useState } from "react";
 
-const CreateEvent = ({ setChange }) => {
-  const {createEvent, eventLoading} = useEventStore();
-  const fileRef = useRef(null);
+const EditEvent = ({ setChange, editEvent }) => {
+  const { events, updateEventLoading, updateEvent } = useEventStore();
+  const event = events.find((event) => event._id === editEvent);
+
+  function toDatetimeLocal(date) {
+    const pad = (n) => n.toString().padStart(2, "0");
+    return (
+      date.getFullYear() +
+      "-" +
+      pad(date.getMonth() + 1) +
+      "-" +
+      pad(date.getDate()) +
+      "T" +
+      pad(date.getHours()) +
+      ":" +
+      pad(date.getMinutes())
+    );
+  }
 
   const [data, setData] = useState({
-    title: "",
-    description: "",
-    category: "",
-    department: "",
-    venue: "",
-    startDate: "",
-    endDate: "",
-    registrationDeadline: "",
-    fee: 0,
-    medias: [],
+    title: event?.title,
+    description: event?.description,
+    category: event?.category,
+    department: event?.department,
+    venue: event?.venue,
+    startDate: toDatetimeLocal(new Date(event?.startDate)),
+    endDate: toDatetimeLocal(new Date(event?.endDate)),
+    registrationDeadline: new Date(event?.registrationDeadline)
+      .toISOString()
+      .slice(0, 10), // only date
+    fee: event?.fee,
   });
   const [error, setError] = useState({});
-
-  const handleImage = async (e) => {
-    const files = Array.from(e.target.files);
-
-    // Restrict maximum number of files
-    if (files.length > 6) {
-      toast.warning("You can only upload a maximum of 6 photos.");
-      e.target.value = "";
-      return;
-    } else if (data.medias.length + files.length > 6) {
-      toast.warning("You can only upload a maximum of 6 photos.");
-      e.target.value = "";
-      return;
-    }
-
-    // ✅ include existing images size in calculation
-    const totalSize =
-      data.medias.reduce((acc, img) => acc + img.length, 0) +
-      files.reduce((acc, file) => acc + file.size, 0);
-
-    if (totalSize > 200 * 1024 * 1024) {
-      toast.warning(
-        "Total size of photos must be less than or equal to 200MB."
-      );
-      e.target.value = "";
-      return;
-    }
-
-    const medias = await Promise.all(
-      files.map(
-        (file) =>
-          new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.readAsDataURL(file);
-          })
-      )
-    );
-
-    setData((prev) => ({ ...prev, medias: [...prev.medias, ...medias] }));
-
-    // ✅ Clear input so re-uploads always work
-    e.target.value = "";
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -123,24 +87,10 @@ const CreateEvent = ({ setChange }) => {
     setError(newError);
 
     if (Object.keys(newError).length === 0) {
-      const res = await createEvent(data);
-      if (res?.success) {
-        setData({
-          title: "",
-          description: "",
-          category: "",
-          department: "",
-          venue: "",
-          startDate: "",
-          endDate: "",
-          registrationDeadline: "",
-          fee: 0,
-          medias: [],
-        });
-        setError({});
-      }
+      updateEvent(event._id, data);
     }
   };
+  
   return (
     <>
       <Card className={"md:w-1/2 w-full my-6"}>
@@ -148,13 +98,13 @@ const CreateEvent = ({ setChange }) => {
           <Button
             size={"icon"}
             variant={"ghost"}
-            onClick={() => setChange(null)}
+            onClick={() => setChange(false)}
           >
             <ArrowLeft />
           </Button>
           <CardTitle className={"flex items-center gap-2 justify-center"}>
-            <CalendarPlus className="size-5" />
-            Create Events
+            <CalendarCog className="size-5" />
+            Update Events
           </CardTitle>
           <CardContent className={"flex flex-col gap-4 px-0 mt-2"}>
             <form onSubmit={handleSubmit} className="flex flex-col gap-2">
@@ -364,43 +314,17 @@ const CreateEvent = ({ setChange }) => {
                 />
               </div>
 
-              <div className="flex items-start justify-between gap-1 w-full mt-2">
-                <Label htmlFor="eventMedia">Event Media:</Label>
-                <input type="file" className="hidden" ref={fileRef} onChange={handleImage} multiple/>
-                <Button
-                  type={"button"}
-                  className={"w-1/2"}
-                  variant={"outline"}
-                  onClick={() => fileRef.current.click()}
-                >
-                  <Upload />
-                  Upload
-                </Button>
-              </div>
-              <div className="grid md:grid-cols-3 grid-cols-2 gap-4">
-                {data.medias?.map((media, i) => (
-                  <div key={i} className="w-full h-25 rounded-md relative">
-                    <Button size={"icon"} variant={"outline"} className={"absolute right-0"} onClick={() => setData((prev) => ({
-                      ...prev,
-                      medias: prev.medias.filter((_, idx) => idx !== i),
-                    }))}><X/></Button>
-                    <img src={media} alt="image" className="w-full h-full object-cover overflow-hidden rounded-md"/>
-                  </div>
-                ))}
-              </div>
-
               <Button
                 type="submit"
                 className={"w-full mt-3"}
-
-                disabled={eventLoading}
+                disabled={updateEventLoading}
               >
-                {eventLoading ? (
+                {updateEventLoading ? (
                   <>
-                  <Loader2 className="animate-spin" />
+                    <Loader2 className="animate-spin" />
                   </>
                 ) : (
-                  "Create"
+                  "Update"
                 )}
               </Button>
             </form>
@@ -411,4 +335,4 @@ const CreateEvent = ({ setChange }) => {
   );
 };
 
-export default CreateEvent;
+export default EditEvent;
