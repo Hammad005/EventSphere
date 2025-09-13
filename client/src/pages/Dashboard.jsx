@@ -72,7 +72,7 @@ const Dashboard = () => {
   };
   return (
     <>
-      <div className="min-h-[calc(100vh-80px)] p-6 flex flex-col gap-4">
+      <div className="min-h-[calc(100vh-80px)] p-1 flex flex-col gap-4">
         <div className="grid md:grid-cols-3 grid-cols-1 gap-8 w-full mt-5">
           {Object.entries(eventGroups).map(([key, arr]) => (
             <Card key={key} className="w-full">
@@ -89,7 +89,7 @@ const Dashboard = () => {
         </div>
 
         <div className="grid lg:grid-cols-12 grid-cols-1 gap-8">
-          <div className="col-span-4 w-full">
+          <div className="lg:col-span-4  w-full">
           <Calendar
             mode="single"
             className="rounded-md border shadow-sm lg:w-full"

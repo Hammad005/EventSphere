@@ -31,6 +31,7 @@ import {
 import DeleteEvent from "@/components/DeleteEvent";
 import EditEvent from "./sub-components/EditEvent";
 import { useNavigate } from "react-router-dom";
+import ViewEvent from "./sub-components/ViewEvent";
 
 const ManageEvents = () => {
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ const ManageEvents = () => {
   const [change, setChange] = useState(null);
   const [editEvent, setEditEvent] = useState(null);
   const [deleteEvent, setDeleteEvent] = useState(null);
+  const [id, setId] = useState(null);
 
   const approveRequest = events?.filter((e) => !e.approved);
   // Group filters in one place
@@ -322,7 +324,14 @@ const ManageEvents = () => {
                             <TableCell className={"flex gap-3"}>
                               <Button
                                 size={"icon"}
-                                onClick={() => navigate(`/event/${event._id}`)}
+                                onClick={() => {
+                                  if (user && user.role !== "participant") {
+                                    setChange("view");
+                                    setId(event._id);
+                                  } else {
+                                    navigate(`/event/${event._id}`);
+                                  }
+                                }}
                               >
                                 <Eye />
                               </Button>
@@ -365,6 +374,8 @@ const ManageEvents = () => {
           </>
         ) : change === "create" ? (
           <CreateEvent setChange={setChange} />
+        ) : change === "view" ? (
+          <ViewEvent setChange={setChange} id={id} setId={setId} />
         ) : (
           <EditEvent
             setChange={setChange}

@@ -171,7 +171,7 @@ export const cancelEvent = async (req, res) => {
 
 export const allApprovedEvents = async (req, res) => {
     try {
-        const events = await Event.find({ approved: true }).sort({ createdAt: -1 }).populate("organizer", "name").populate("createdBy", "name");
+        const events = await Event.find({ approved: true }).sort({ createdAt: -1 }).populate("organizer", "name").populate("createdBy", "name").populate("participants", "name");
         res.status(200).json({ events });
     } catch (error) {
         console.log(error);
@@ -180,7 +180,7 @@ export const allApprovedEvents = async (req, res) => {
 };
 export const allEvents = async (req, res) => {
     try {
-        const events = await Event.find({}).sort({ createdAt: -1 }).populate("organizer", "name").populate("createdBy", "name");
+        const events = await Event.find({}).sort({ createdAt: -1 }).populate("organizer", "name").populate("createdBy", "name").populate("participants.user", "name");
         res.status(200).json({ events });
     } catch (error) {
         console.log(error);
@@ -344,6 +344,12 @@ export const issueCertificate = async (req, res) => {
         };
 
         // prevent duplicate attendance in user
+        const notAttendedUser = user.registeredEvents.some(
+            (r) => r.eventId.toString() === event._id.toString() && r.attended === true
+        );
+        if (!notAttendedUser) {
+            return res.status(400).json({ error: "User has not attended the event" });
+        }
         const alreadyAttendedUser = user.registeredEvents.some(
             (r) => r.eventId.toString() === event._id.toString() && r.certificateIssued === true
         );
