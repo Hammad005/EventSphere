@@ -7,6 +7,7 @@ export const useEventStore = create((set) => ({
     events: [],
     eventLoading: false,
     updateEventLoading: false,
+    registerLoading: false,
 
     getAllEvents: async () => {
         set({ eventLoading: true });
@@ -95,6 +96,21 @@ export const useEventStore = create((set) => ({
             toast.success("Event approved successfully")
         } catch (error) {
             set({ eventLoading: false });
+            toast.error(error.response.data.error);
+            console.log(error);
+        }
+    },
+    participateInEvent: async (id) => {
+        set({registerLoading: true});
+        try {
+            const res = await axios.post(`/event/register/${id}`);
+            useAuthStore.setState((state) => ({
+                participatedEvents: [res.data.eventId?._id, ...(state.participatedEvents || [])]
+            }));
+            set({registerLoading: false});
+            toast.success("Event registered successfully");
+        } catch (error) {
+            set({registerLoading: false});
             toast.error(error.response.data.error);
             console.log(error);
         }

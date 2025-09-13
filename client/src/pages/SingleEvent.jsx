@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useEventStore } from "@/store/useEventStore";
-import { TicketCheck } from "lucide-react";
+import { Loader2, TicketCheck } from "lucide-react";
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 const SingleEvent = () => {
+  const { participateInEvent, registerLoading } = useEventStore();
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -14,7 +14,7 @@ const SingleEvent = () => {
     });
   }, []);
   const { id } = useParams();
-  const {user} = useAuthStore();
+  const { user } = useAuthStore();
 
   const event = useEventStore((state) => state.events);
   const filterdEvent = event?.find((ev) => ev._id === id);
@@ -67,22 +67,36 @@ const SingleEvent = () => {
             <span className="text-green-500 font-bold mr-2">Organizer:</span>{" "}
             {filterdEvent?.organizer?.name}
           </p>
-          {filterdEvent?.createdBy && <p className="flex justify-between border p-1 text-end">
-            <span className="text-green-500 font-bold mr-2">Approved By:</span>{" "}
-            {filterdEvent?.createdBy?.name}
-          </p>}
+          {filterdEvent?.createdBy && (
+            <p className="flex justify-between border p-1 text-end">
+              <span className="text-green-500 font-bold mr-2">
+                Approved By:
+              </span>{" "}
+              {filterdEvent?.createdBy?.name}
+            </p>
+          )}
           <p className="flex justify-between border p-1 text-end">
             <span className="text-green-500 font-bold mr-2">Fee:</span> Rs.{" "}
             {filterdEvent?.fee}/-
           </p>
 
           <div className="flex items-center justify-center w-full">
-            {
-            user && <Button className="w-1/2 mt-4">
-              <TicketCheck />
-              Participate
-            </Button>
-            }
+            {user && user?.role === "participant" && (
+              <Button
+                className="w-1/2 mt-4"
+                onClick={() => participateInEvent(id)}
+                disabled={registerLoading}
+              >
+                {registerLoading ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <>
+                    <TicketCheck />
+                    Participate
+                  </>
+                )}
+              </Button>
+            )}
           </div>
         </div>
       </div>

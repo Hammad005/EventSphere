@@ -190,7 +190,6 @@ export const allEvents = async (req, res) => {
 
 export const registerInEvent = async (req, res) => {
     const { id } = req.params;
-    const { paymentStatus } = req.body;
 
     try {
         const event = await Event.findById(id);
@@ -229,24 +228,16 @@ export const registerInEvent = async (req, res) => {
             return res.status(400).json({ error: "Already registered for this event" });
         }
 
-        const finalPaymentStatus =
-            event.fee > 0
-                ? paymentStatus
-                    ? paymentStatus
-                    : "pending"
-                : "not_required";
 
         // push into user
         user.registeredEvents.push({
             eventId: event._id,
-            paymentStatus: finalPaymentStatus,
         });
         await user.save();
 
         // push into event
         event.participants.push({
             user: user._id,
-            paymentStatus: finalPaymentStatus,
         });
         await event.save();
 
