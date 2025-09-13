@@ -10,6 +10,7 @@ import image3 from "../assets/3.jpg";
 import image4 from "../assets/4.jpg";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
+import Contact from "./sub-components/Contact";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -178,6 +179,9 @@ const Home = () => {
           </div>
         </div>
       </section>
+<div className="lg:hidden block ">
+      <Contact/>
+</div>
     </div>
   );
 };

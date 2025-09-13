@@ -240,7 +240,6 @@ const ManageEvents = () => {
                   <SelectItem value="upcoming">Upcoming Events</SelectItem>
                   <SelectItem value="ongoing">Ongoing Events</SelectItem>
                   <SelectItem value="completed">Completed Events</SelectItem>
-                  <SelectItem value="cancelled">Cancelled Events</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -292,7 +291,7 @@ const ManageEvents = () => {
                             )}
                             {user?.role === "participant" && (
                               <TableCell>
-                                {event.participants.includes(user._id) ? (
+                                {event.participants.find((p) => p.user === user._id)?.certificateIssued ? (
                                   <Check className="text-green-500" />
                                 ) : (
                                   <X className="text-red-500" />

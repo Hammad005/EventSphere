@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useEventStore } from "@/store/useEventStore";
-import { ArrowLeft, Check, Loader2, TicketCheck, X } from "lucide-react";
+import { ArrowLeft, Check, FileCheck2, Loader2, TicketCheck, UserCheck, X } from "lucide-react";
 import React, { useEffect } from "react";
 import {
   Carousel,
@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/table";
 
 const ViewEvent = ({ setChange, id, setId }) => {
-  const { participateInEvent, registerLoading } = useEventStore();
+  const { participateInEvent, registerLoading, attendEvent, eventLoading, issueCertificate } = useEventStore();
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -38,7 +38,7 @@ const ViewEvent = ({ setChange, id, setId }) => {
 
   return (
     <>
-      <div className="flex items-center justify-center min-h-[calc(100vh-75px)] w-full p-8">
+      <div className="flex items-center justify-center min-h-[calc(100vh-75px)] w-full lg:p-8">
         <div className="flex flex-col gap-2 w-full">
           <Button
             variant={"outline"}
@@ -171,7 +171,14 @@ const ViewEvent = ({ setChange, id, setId }) => {
                             <TableCell>
                               {new Date(participant.registeredAt).toLocaleString()}
                             </TableCell>
-                            <TableCell></TableCell>
+                            <TableCell className={"flex items-center gap-2"}>
+                                <Button size={"icon"} variant={"outline"} onClick={() => attendEvent(filterdEvent._id, participant.user._id)} disabled={eventLoading}>
+                                    <UserCheck/>
+                                </Button>
+                                <Button size={"icon"} onClick={() => issueCertificate(filterdEvent._id, participant.user._id)} disabled={eventLoading}>
+                                    <FileCheck2/>
+                                </Button>
+                            </TableCell>
                           </TableRow>
                         );
                       })
@@ -188,7 +195,7 @@ const ViewEvent = ({ setChange, id, setId }) => {
 
           <div className="flex justify-center items-center w-full mt-4">
             {filterdEvent?.feedback?.length > 0 && (
-              <div className="w-1/2">
+              <div className="lg:w-1/2 w-full">
                 <p className="font-bold text-center mb-2">
                   Total feedbacks: {filterdEvent?.feedback?.length}
                 </p>
@@ -207,8 +214,10 @@ const ViewEvent = ({ setChange, id, setId }) => {
                       </CarouselItem>
                     ))}
                   </CarouselContent>
+                  <div className="lg:block hidden">
                   <CarouselPrevious />
                   <CarouselNext />
+                  </div>
                 </Carousel>
               </div>
             )}

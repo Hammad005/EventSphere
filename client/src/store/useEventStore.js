@@ -108,7 +108,7 @@ export const useEventStore = create((set) => ({
                 participatedEvents: [res.data.eventId?._id, ...(state.participatedEvents || [])]
             }));
             set({ registerLoading: false });
-            toast.success("Event registered successfully");
+            toast.success("Participation successfully");
         } catch (error) {
             set({ registerLoading: false });
             toast.error(error.response.data.error);
@@ -132,6 +132,95 @@ export const useEventStore = create((set) => ({
         } catch (error) {
             set({ eventLoading: false });
             toast.error(error.response?.data?.error || "Failed to post feedback");
+            console.error(error);
+        }
+    },
+    attendEvent: async (id, userId) => {
+        set({ eventLoading: true });
+        try {
+            await axios.patch(`/event/attended/${id}/${userId}`);
+
+            // Update allUsers
+            useAuthStore.setState((state) => ({
+                allUsers: state.allUsers.map((u) =>
+                    u._id === userId
+                        ? {
+                            ...u,
+                            registeredEvents: [
+                                ...u.registeredEvents,
+                                { eventId: id, status: "attended" },
+                            ],
+                        }
+                        : u
+                ),
+            }));
+
+            // Update events (force string compare to prevent duplicate)
+            set((state) => ({
+                events: state.events.map((event) =>
+                    event._id === id
+                        ? {
+                            ...event,
+                            status: "ongoing",
+                            participants: event.participants.map((p) =>
+                                String(p.user._id) === String(userId)
+                                    ? { ...p, attended: true }
+                                    : p
+                            ),
+                        }
+                        : event
+                ),
+                eventLoading: false,
+            }));
+
+            toast.success("User attended event successfully");
+        } catch (error) {
+            set({ eventLoading: false });
+            toast.error(error.response?.data?.error || "Failed to mark attendance");
+            console.error(error);
+        }
+    },
+
+    issueCertificate: async (id, userId) => {
+        set({ eventLoading: true });
+        try {
+            await axios.patch(`/event/issueCertificate/${id}/${userId}`);
+            // Update allUsers
+            useAuthStore.setState((state) => ({
+                allUsers: state.allUsers.map((u) =>
+                    u._id === userId
+                        ? {
+                            ...u,
+                            registeredEvents: [
+                                ...u.registeredEvents,
+                                { eventId: id, certificateIssued: "attended" },
+                            ],
+                        }
+                        : u
+                ),
+            }));
+
+            set((state) => ({
+                events: state.events.map((event) =>
+                    event._id === id
+                        ? {
+                            ...event,
+                            status: "completed",
+                            participants: event.participants.map((p) =>
+                                String(p.user._id) === String(userId)
+                                    ? { ...p, certificateIssued: true }
+                                    : p
+                            ),
+                        }
+                        : event
+                ),
+                eventLoading: false,
+            }));
+
+            toast.success("Certificate issued successfully");
+        } catch (error) {
+            set({ eventLoading: false });
+            toast.error(error.response?.data?.error || "Failed to issue certificate");
             console.error(error);
         }
     }

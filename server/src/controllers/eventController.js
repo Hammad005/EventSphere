@@ -256,6 +256,7 @@ export const registerInEvent = async (req, res) => {
 
 export const eventAttended = async (req, res) => {
     const { id, userId } = req.params;
+    
     try {
         const event = await Event.findById(id);
         if (!event) {
@@ -263,13 +264,13 @@ export const eventAttended = async (req, res) => {
         };
         if (req.user?.role !== "admin" && event?.organizer !== req.user?._id) {
             return res.status(403).json({ error: "You are not eligible to mark user attendance" });
-        } else if (startDate > new Date() || endDate < new Date()) {
+        } else if (new Date() > event.registrationDeadline) {
             return res.status(400).json({ error: "Event registration deadline has passed" });
         }
 
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ error: "Event not found" });
+            return res.status(404).json({ error: "User not found" });
         };
 
         // prevent duplicate attendance in user
@@ -345,7 +346,7 @@ export const issueCertificate = async (req, res) => {
 
         // prevent duplicate attendance in user
         const notAttendedUser = user.registeredEvents.some(
-            (r) => r.eventId.toString() === event._id.toString() && r.attended === true
+            (r) => r.eventId.toString() === event._id.toString() && r.status !== "attended"
         );
         if (!notAttendedUser) {
             return res.status(400).json({ error: "User has not attended the event" });
