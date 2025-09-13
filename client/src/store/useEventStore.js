@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { create } from "zustand";
 import { useAuthStore } from "./useAuthStore";
 
-export const useEventStore = create((set) => ({
+export const useEventStore = create((set, get) => ({
     events: [],
     eventLoading: false,
     updateEventLoading: false,
@@ -35,10 +35,10 @@ export const useEventStore = create((set) => ({
         set({ eventLoading: true });
         try {
             const res = await axios.post("/event/create", data);
-            set((state) => {
-                state.events.push(res.data.event);
-                return { eventLoading: false };
-            });
+            set((state) => ({
+                events: [state.events, res.data.event],
+                eventLoading: false
+            }));
             toast.success("Event created successfully");
             return { success: true }
         } catch (error) {
@@ -107,6 +107,7 @@ export const useEventStore = create((set) => ({
             useAuthStore.setState((state) => ({
                 participatedEvents: [res.data.eventId?._id, ...(state.participatedEvents || [])]
             }));
+            get().getAllEvents();
             set({ registerLoading: false });
             toast.success("Participation successfully");
         } catch (error) {

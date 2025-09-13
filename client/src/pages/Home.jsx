@@ -18,8 +18,8 @@ import { useEventStore } from "@/store/useEventStore";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const Home = () => {
-    const events = useEventStore((state) => state.events);
-  
+  const events = useEventStore((state) => state.events);
+
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -172,55 +172,68 @@ const Home = () => {
       <section className="container mx-auto px-4 py-20 shadow-inner">
         <h2 className="text-3xl md:text-5xl font-bold mb-6 text-center">
           Recent Events
-          </h2>
+        </h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-6">
-        {events?.slice(0, 3)?.map((ev) => (
-          <Card key={ev._id} className="overflow-hidden">
-            <div className="w-full h-64 overflow-hidden -mt-10 group relative">
-              <img
-                src={ev.medias[0].mediaUrl}
-                alt={ev.title}
-                className="w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
-              />
-            </div>
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold">{ev.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-2">
-                <p>{ev.description}</p>
-                <p className="flex justify-between border p-1">
-                  <span className="text-green-500 font-bold mr-2">Category:</span> {ev.category}
-                </p>
-                <p className="flex justify-between border p-1">
-                  <span className="text-green-500 font-bold mr-2">Status:</span> {ev.status}
-                </p>
-                <p className="flex justify-between border p-1">
-                  <span className="text-green-500 font-bold mr-2">Start:</span>{" "}
-                  {new Date(ev.startDate).toLocaleString()}
-                </p>
-                <p className="flex justify-between border p-1">
-                  <span className="text-green-500 font-bold mr-2">End:</span>{" "}
-                  {new Date(ev.endDate).toLocaleString()}
-                </p>
-                <p className="flex justify-between border p-1">
-                  <span className="text-green-500 font-bold mr-2">Reg End:</span>{" "}
-                  {new Date(ev.registrationDeadline).toDateString()}
-                </p>
-                <p className="flex justify-between border p-1">
-                  <span className="text-green-500 font-bold mr-2">Fee:</span> Rs. {ev.fee}/-
-                </p>
-                <Button asChild>
-                  <Link to={`/event/${ev._id}`}>
-                    <Eye />
-                    View Event
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+          {events?.slice(0, 3)?.map((ev) => (
+            <Card key={ev._id} className="overflow-hidden">
+              {ev?.medias.length > 0 && (
+                <div className="w-full h-64 overflow-hidden -mt-10 group relative">
+                  <img
+                    src={ev?.medias[0]?.mediaUrl}
+                    alt={ev.title}
+                    className="w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
+                  />
+                </div>
+              )}
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold">{ev.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-2">
+                  <p>{ev.description}</p>
+                  <p className="flex justify-between border p-1">
+                    <span className="text-green-500 font-bold mr-2">
+                      Category:
+                    </span>{" "}
+                    {ev.category}
+                  </p>
+                  <p className="flex justify-between border p-1">
+                    <span className="text-green-500 font-bold mr-2">
+                      Status:
+                    </span>{" "}
+                    {ev.status}
+                  </p>
+                  <p className="flex justify-between border p-1">
+                    <span className="text-green-500 font-bold mr-2">
+                      Start:
+                    </span>{" "}
+                    {new Date(ev.startDate).toLocaleString()}
+                  </p>
+                  <p className="flex justify-between border p-1">
+                    <span className="text-green-500 font-bold mr-2">End:</span>{" "}
+                    {new Date(ev.endDate).toLocaleString()}
+                  </p>
+                  <p className="flex justify-between border p-1">
+                    <span className="text-green-500 font-bold mr-2">
+                      Reg End:
+                    </span>{" "}
+                    {new Date(ev.registrationDeadline).toDateString()}
+                  </p>
+                  <p className="flex justify-between border p-1">
+                    <span className="text-green-500 font-bold mr-2">Fee:</span>{" "}
+                    Rs. {ev.fee}/-
+                  </p>
+                  <Button asChild>
+                    <Link to={`/event/${ev._id}`}>
+                      <Eye />
+                      View Event
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </section>
 
       {/* Call to Action Section for Different Roles */}

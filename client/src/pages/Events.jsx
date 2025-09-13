@@ -27,6 +27,7 @@ const Events = () => {
       })
     }, [])
   const events = useEventStore((state) => state.events);
+  
 
   // states for filters
   const [category, setCategory] = useState("all");
@@ -104,13 +105,13 @@ const Events = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredEvents?.map((ev) => (
           <Card key={ev._id} className="overflow-hidden">
-            <div className="w-full h-64 overflow-hidden -mt-10 group relative">
+            {ev.medias.length > 0 && <div className="w-full h-64 overflow-hidden -mt-10 group relative">
               <img
-                src={ev.medias[0].mediaUrl}
+                src={ev?.medias[0]?.mediaUrl}
                 alt={ev.title}
                 className="w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
               />
-            </div>
+            </div>}
             <CardHeader>
               <CardTitle className="text-2xl font-bold">{ev.title}</CardTitle>
             </CardHeader>

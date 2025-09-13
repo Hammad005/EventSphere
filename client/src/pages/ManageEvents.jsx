@@ -62,44 +62,50 @@ const ManageEvents = () => {
         ? events?.filter(
             (e) =>
               e.status === "upcoming" &&
-              e.organizer?.toString() === user._id.toString()
+              e.organizer?._id?.toString() === user._id.toString()
           )
         : events?.filter(
             (e) =>
               e.status === "upcoming" &&
               e.approved &&
               e.participants.some(
-                (p) => p.user?.toString() === user._id.toString()
+                (p) => p.user?._id?.toString() === user._id.toString()
               )
           ),
+
     ongoing:
       user?.role === "admin"
         ? events?.filter((e) => e.status === "ongoing" && e.approved)
         : user?.role === "organizer"
         ? events?.filter(
-            (e) => e.status === "ongoing" && e.organizer === user._id
+            (e) =>
+              e.status === "ongoing" &&
+              e.organizer?._id?.toString() === user._id.toString()
           )
         : events?.filter(
             (e) =>
               e.status === "ongoing" &&
               e.approved &&
               e.participants.some(
-                (p) => p.user?.toString() === user._id.toString()
+                (p) => p.user?._id?.toString() === user._id.toString()
               )
           ),
+
     completed:
       user?.role === "admin"
         ? events?.filter((e) => e.status === "completed" && e.approved)
         : user?.role === "organizer"
         ? events?.filter(
-            (e) => e.status === "completed" && e.organizer === user._id
+            (e) =>
+              e.status === "completed" &&
+              e.organizer?._id?.toString() === user._id.toString()
           )
         : events?.filter(
             (e) =>
               e.status === "completed" &&
               e.approved &&
               e.participants.some(
-                (p) => p.user?.toString() === user._id.toString()
+                (p) => p.user?._id?.toString() === user._id.toString()
               )
           ),
   };
@@ -203,7 +209,7 @@ const ManageEvents = () => {
                                   {new Date(event.endDate).toLocaleString()}
                                 </TableCell>
                                 <TableCell>{event.fee}</TableCell>
-                                <TableCell>{event.organizer.name}</TableCell>
+                                <TableCell>{event.organizer?.name}</TableCell>
                                 <TableCell className={"flex justify-center"}>
                                   <Button
                                     type={"button"}
@@ -291,7 +297,9 @@ const ManageEvents = () => {
                             )}
                             {user?.role === "participant" && (
                               <TableCell>
-                                {event.participants.find((p) => p.user === user._id)?.certificateIssued ? (
+                                {event.participants.find(
+                                  (p) => p.user === user._id
+                                )?.certificateIssued ? (
                                   <Check className="text-green-500" />
                                 ) : (
                                   <X className="text-red-500" />
