@@ -1,8 +1,14 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useAuthStore } from "@/store/useAuthStore";
-import React from "react";
+import React, { useEffect } from "react";
 
 const Notifications = () => {
+  useEffect(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, [])
   const { userNotifications } = useAuthStore();
   return (
     <div className="flex flex-col gap-4 my-10">

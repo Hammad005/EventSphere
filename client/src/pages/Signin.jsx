@@ -9,13 +9,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Info, Loader2, LogIn } from "lucide-react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useNavigate } from "react-router-dom";
 import { useGSAP } from "@gsap/react";
 import { useAuthStore } from "@/store/useAuthStore";
 
 const Signin = () => {
+  useEffect(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, [])
   const {signin, userLoading} = useAuthStore();
   const cardRef = useRef(null);
   const [data, setData] = useState({

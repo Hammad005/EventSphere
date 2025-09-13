@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardAction,
@@ -11,6 +11,12 @@ import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Messages = () => {
+  useEffect(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, [])
   const { messages, deleteMessage, messageLoading } = useChatStore();
   const [deletingId, setSeletingId] = useState(null);
 

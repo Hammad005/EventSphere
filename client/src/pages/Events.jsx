@@ -15,11 +15,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { useEventStore } from "@/store/useEventStore";
 import { Eye } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 
 const Events = () => {
+  useEffect(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, [])
   const events = useEventStore((state) => state.events);
 
   // states for filters

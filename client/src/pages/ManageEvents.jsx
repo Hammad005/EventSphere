@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuthStore } from "@/store/useAuthStore";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -32,6 +32,12 @@ import DeleteEvent from "@/components/DeleteEvent";
 import EditEvent from "./sub-components/EditEvent";
 
 const ManageEvents = () => {
+  useEffect(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, [])
   const events = useEventStore((state) => state.events);
   const approveEvent = useEventStore((state) => state.approveEvent);
   const eventLoading = useEventStore((state) => state.eventLoading);

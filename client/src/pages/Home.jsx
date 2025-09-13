@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -14,6 +14,13 @@ import { useAuthStore } from "@/store/useAuthStore";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const Home = () => {
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    })
+  }, [])
+  
   const { user } = useAuthStore();
   const mainRef = useRef(null);
   const heroTextRef = useRef(null);

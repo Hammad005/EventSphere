@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Info, Loader2, UserRoundPlus } from "lucide-react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -23,6 +23,12 @@ import { useGSAP } from "@gsap/react";
 import { useAuthStore } from "@/store/useAuthStore";
 
 const Signup = () => {
+  useEffect(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, [])
   const {signup, userLoading} = useAuthStore(); 
   const cardRef = useRef(null);
   const [data, setData] = useState({

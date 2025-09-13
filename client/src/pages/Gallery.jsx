@@ -1,8 +1,14 @@
-import React  from "react";
+import React, { useEffect }  from "react";
 import { useEventStore } from "@/store/useEventStore";
 import { Link } from "react-router-dom";
 
 const Gallery = () => {
+  useEffect(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, [])
   const events = useEventStore((state) => state.events);
 
   return (

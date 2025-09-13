@@ -1,9 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEventStore } from "@/store/useEventStore";
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 const SingleEvent = () => {
+    useEffect(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        })
+      }, [])
   const { id } = useParams();
 
   const event = useEventStore((state) => state.events);

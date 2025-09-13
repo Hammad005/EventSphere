@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuthStore } from "@/store/useAuthStore";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AddOrganizers from "./sub-components/AddOrganizers";
 import {
   Table,
@@ -15,6 +15,12 @@ import { Button } from "@/components/ui/button";
 import { UserPlus2 } from "lucide-react";
 
 const ManageUser = () => {
+  useEffect(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, [])
   const { allUsers, switchActivation, switchActivationLoading } =
     useAuthStore();
 

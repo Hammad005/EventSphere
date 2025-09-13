@@ -3,8 +3,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuthStore } from "@/store/useAuthStore";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 const Profile = () => {
+  useEffect(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, [])
   const { user, updateUser, updateUserLoading } = useAuthStore();
 
   const [data, setData] = useState({
