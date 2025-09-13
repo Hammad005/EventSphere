@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { protectRoute } from '../middleware/protectRoute.js';
-import { allEvents, approveEvent, cancelEvent, createEvent, deleteEvent, editEvent, eventAttended, eventFeedback, issueCertificate, registerInEvent } from '../controllers/eventController.js';
+import { allApprovedEvents, allEvents, approveEvent, cancelEvent, createEvent, deleteEvent, editEvent, eventAttended, eventFeedback, issueCertificate, registerInEvent } from '../controllers/eventController.js';
 
 const eventRouter = Router();
 
 eventRouter.get('/getAllEvents', allEvents);
+eventRouter.get('/getAllApprovedEvents', allApprovedEvents);
 
 eventRouter.post('/create', protectRoute, createEvent);
 

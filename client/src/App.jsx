@@ -19,6 +19,7 @@ import { useEventStore } from "./store/useEventStore";
 import About from "./pages/About";
 import Events from "./pages/Events";
 import Gallery from "./pages/Gallery";
+import SingleEvent from "./pages/SingleEvent";
 
 const protectedRoutes = (condition, children, navigate) => {
   return condition ? children : <Navigate to={navigate} />;
@@ -26,19 +27,26 @@ const protectedRoutes = (condition, children, navigate) => {
 const App = () => {
   const { authLoading, user, checkAuth, getAllUsers } = useAuthStore();
   const { getMessages } = useChatStore();
-  const { getAllEvents } = useEventStore();
+  const { getAllEvents, getAllApprovedEvents } = useEventStore();
 
   useEffect(() => {
     checkAuth();
-    getAllEvents();
-  }, [checkAuth, getAllEvents]);
+    
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (user && user?.role !== "admin") {
+      getAllApprovedEvents();
+    }
+  }, [getAllApprovedEvents, user?.role, user]);
 
   useEffect(() => {
     if (user?.role === "admin") {
       getMessages();
       getAllUsers();
+      getAllEvents();
     }
-  }, [getMessages, user?.role, getAllUsers]);
+  }, [getMessages, user?.role, getAllUsers, getAllEvents]);
 
   if (authLoading) return <Loading />;
   return (
@@ -76,6 +84,7 @@ const App = () => {
           <Route path="/about" element={<About />} />
           <Route path="/events" element={<Events />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/event/:id" element={<SingleEvent />} />
           <Route
             path="/signin"
             element={protectedRoutes(!user, <Signin />, "/")}

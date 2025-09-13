@@ -169,9 +169,18 @@ export const cancelEvent = async (req, res) => {
     }
 };
 
+export const allApprovedEvents = async (req, res) => {
+    try {
+        const events = await Event.find({ approved: true }).sort({ createdAt: -1 }).populate("organizer", "name");
+        res.status(200).json({ events });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message || "Internal Server Error" });
+    }
+};
 export const allEvents = async (req, res) => {
     try {
-        const events = await Event.find({}).sort({ createdAt: -1 });
+        const events = await Event.find({}).sort({ createdAt: -1 }).populate("organizer", "name");
         res.status(200).json({ events });
     } catch (error) {
         console.log(error);

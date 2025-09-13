@@ -1,13 +1,12 @@
-import React, { useRef } from "react";
+import React  from "react";
 import { useEventStore } from "@/store/useEventStore";
 import { Link } from "react-router-dom";
 
 const Gallery = () => {
   const events = useEventStore((state) => state.events);
-  const containerRef = useRef(null);
 
   return (
-    <div ref={containerRef} className="p-6">
+    <div className="p-6">
       <h2 className="text-6xl font-bold mb-8 text-center font-serif">
         Gallery
       </h2>
@@ -15,7 +14,7 @@ const Gallery = () => {
         {events?.map((ev) =>
           ev.medias.map((src, index) => (
             <Link
-              to={`/events/${ev._id}`}
+              to={`/event/${ev._id}`}
               key={index}
               className="gallery-card rounded-2xl overflow-hidden shadow-lg group hover:scale-105 transform transition duration-300 relative"
             >

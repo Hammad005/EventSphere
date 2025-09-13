@@ -19,6 +19,17 @@ export const useEventStore = create((set) => ({
             console.log(error);
         }
     },
+    getAllApprovedEvents: async () => {
+        set({ eventLoading: true });
+        try {
+            const res = await axios.get("/event/getAllApprovedEvents");
+            set({ eventLoading: false, events: res.data.events });
+        } catch (error) {
+            set({ eventLoading: false });
+            toast.error(error.response.data.error);
+            console.log(error);
+        }
+    },
     createEvent: async (data) => {
         set({ eventLoading: true });
         try {
