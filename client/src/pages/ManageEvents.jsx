@@ -30,19 +30,21 @@ import {
 } from "@/components/ui/select";
 import DeleteEvent from "@/components/DeleteEvent";
 import EditEvent from "./sub-components/EditEvent";
+import { useNavigate } from "react-router-dom";
 
 const ManageEvents = () => {
+  const navigate = useNavigate();
   useEffect(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      })
-    }, [])
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, []);
   const events = useEventStore((state) => state.events);
   const approveEvent = useEventStore((state) => state.approveEvent);
   const eventLoading = useEventStore((state) => state.eventLoading);
 
-  const { user, allUsers } = useAuthStore();
+  const { user } = useAuthStore();
 
   const [change, setChange] = useState(null);
   const [editEvent, setEditEvent] = useState(null);
@@ -52,11 +54,22 @@ const ManageEvents = () => {
   // Group filters in one place
   const eventGroups = {
     upcoming:
-      user?.role === "admin"
-        ? events.filter((e) => e.status === "upcoming" && e.approved)
-        : events.filter(
-            (e) => e.status === "upcoming" && e.organizer === user._id
-          ),
+  user?.role === "admin"
+    ? events.filter((e) => e.status === "upcoming" && e.approved)
+    : user?.role === "organizer"
+    ? events.filter(
+        (e) =>
+          e.status === "upcoming" &&
+          e.organizer?.toString() === user._id.toString()
+      )
+    : events.filter(
+        (e) =>
+          e.status === "upcoming" &&
+          e.approved &&
+          e.participants.some(
+            (p) => p.user?.toString() === user._id.toString()
+          )
+      ),
     ongoing:
       user?.role === "admin"
         ? events.filter((e) => e.status === "ongoing" && e.approved)
@@ -101,11 +114,16 @@ const ManageEvents = () => {
         {!change ? (
           <>
             {/* Create Button */}
-            <div className="flex justify-end w-full mt-5">
-              <Button onClick={() => setChange("create")} variant={"secondary"}>
-                <CalendarPlus /> Create Events
-              </Button>
-            </div>
+            {user?.role !== "participant" && (
+              <div className="flex justify-end w-full mt-5">
+                <Button
+                  onClick={() => setChange("create")}
+                  variant={"secondary"}
+                >
+                  <CalendarPlus /> Create Events
+                </Button>
+              </div>
+            )}
 
             {/* Stat Cards */}
             {user?.role === "admin" && (
@@ -154,12 +172,6 @@ const ManageEvents = () => {
                       <TableBody>
                         {approveRequest.length > 0 ? (
                           approveRequest?.map((event) => {
-                            const organizer =
-                              event.organizer === user._id
-                                ? user.name
-                                : allUsers.find(
-                                    (r) => r._id === event.organizer
-                                  )?.name;
 
                             return (
                               <TableRow key={event._id}>
@@ -179,7 +191,7 @@ const ManageEvents = () => {
                                   {new Date(event.endDate).toLocaleString()}
                                 </TableCell>
                                 <TableCell>{event.fee}</TableCell>
-                                <TableCell>{organizer}</TableCell>
+                                <TableCell>{event.organizer.name}</TableCell>
                                 <TableCell className={"flex justify-center"}>
                                   <Button
                                     type={"button"}
@@ -227,38 +239,45 @@ const ManageEvents = () => {
                 <Table>
                   <TableHeader className="bg-secondary">
                     <TableRow>
-                      <TableHead>Approved</TableHead>
+                      {user?.role !== "participant" && <TableHead>Approved</TableHead>}
+                      {user?.role === "participant" && <TableHead>Certificated Issued</TableHead>}
                       <TableHead>Title</TableHead>
                       <TableHead>Category</TableHead>
+                      {user?.role === "participant" && <TableHead>Department</TableHead>}
+                      {user?.role === "participant" && <TableHead>Venue</TableHead>}
                       <TableHead>Start Date</TableHead>
                       <TableHead>End Date</TableHead>
                       <TableHead>Fee</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Organizer</TableHead>
-                      <TableHead>Total Participants</TableHead>
+                      {user?.role !== "participant" && <TableHead>Total Participants</TableHead>}
                       <TableHead className={"text-center"}>Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {displayedEvents?.length > 0 ? (
                       displayedEvents?.map((event) => {
-                        const organizer =
-                          event.organizer === user._id
-                            ? user.name
-                            : allUsers.find((r) => r._id === event.organizer)
-                                ?.name;
 
                         return (
                           <TableRow key={event._id}>
-                            <TableCell>
+                            {user?.role !== "participant" &&<TableCell>
                               {event.approved ? (
                                 <Check className="text-green-500" />
                               ) : (
                                 <X className="text-red-500" />
                               )}
-                            </TableCell>
+                            </TableCell>}
+                            {user?.role === "participant" &&<TableCell>
+                              {event.participants.includes(user._id) ? (
+                                <Check className="text-green-500" />
+                              ) : (
+                                <X className="text-red-500" />
+                              )}
+                            </TableCell>}
                             <TableCell>{event.title}</TableCell>
                             <TableCell>{event.category}</TableCell>
+                            {user?.role === "participant" && <TableCell>{event.department}</TableCell>}
+                            {user?.role === "participant" && <TableCell>{event.venue}</TableCell>}
                             <TableCell>
                               {new Date(event.startDate).toLocaleString()}
                             </TableCell>
@@ -267,18 +286,24 @@ const ManageEvents = () => {
                             </TableCell>
                             <TableCell>{event.fee}</TableCell>
                             <TableCell>{event.status}</TableCell>
-                            <TableCell>{organizer}</TableCell>
-                            <TableCell className="text-center">
+                            <TableCell>{event.organizer.name}</TableCell>
+                            {user?.role !== "participant" && <TableCell className="text-center">
                               {event.participants.length}
-                            </TableCell>
+                            </TableCell>}
                             <TableCell className={"flex gap-3"}>
-                              <Button size={"icon"}>
+                              <Button size={"icon"} onClick={() => navigate(`/event/${event._id}`)}>
                                 <Eye />
                               </Button>
-                              <Button size={"icon"} variant={"outline"} onClick={() => {
-                                setEditEvent(event._id)
-                                setChange("edit")
-                              }}>
+                              {user && user.role !== "participant" && (
+                                <>
+                                <Button
+                                size={"icon"}
+                                variant={"outline"}
+                                onClick={() => {
+                                  setEditEvent(event._id);
+                                  setChange("edit");
+                                }}
+                              >
                                 <Edit />
                               </Button>
                               <Button
@@ -289,7 +314,7 @@ const ManageEvents = () => {
                                 }}
                               >
                                 <Trash2 />
-                              </Button>
+                              </Button></>)}
                             </TableCell>
                           </TableRow>
                         );
@@ -304,10 +329,14 @@ const ManageEvents = () => {
               </div>
             </div>
           </>
-        ) : change === "create" ?(
+        ) : change === "create" ? (
           <CreateEvent setChange={setChange} />
         ) : (
-          <EditEvent setChange={setChange} editEvent={editEvent} setEditEvent={setEditEvent}/>
+          <EditEvent
+            setChange={setChange}
+            editEvent={editEvent}
+            setEditEvent={setEditEvent}
+          />
         )}
       </div>
     </>
