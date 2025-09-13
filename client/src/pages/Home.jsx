@@ -104,7 +104,7 @@ const Home = () => {
               to all campus happenings.
             </p>
           </div>
-          <Button className="hero-cta-button text-lg px-8 py-6 rounded-full font-bold shadow-lg transition-transform duration-300 hover:scale-125">
+          <Button onClick={() => navigate('/events')} className="hero-cta-button text-lg px-8 py-6 rounded-full font-bold shadow-lg transition-transform duration-300 hover:scale-125">
             View Events
           </Button>
         </div>
@@ -122,7 +122,7 @@ const Home = () => {
               high-quality images and videos from cultural fests, technical
               competitions, and more.
             </p>
-            <Button size="lg">View Gallery</Button>
+            <Button size="lg" onClick={() => navigate('/gallery')}>View Gallery</Button>
           </div>
           <div className="md:w-1/2 grid grid-cols-2 gap-4">
             {/* Replace with actual images from your project */}

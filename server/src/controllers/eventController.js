@@ -171,7 +171,7 @@ export const cancelEvent = async (req, res) => {
 
 export const allApprovedEvents = async (req, res) => {
     try {
-        const events = await Event.find({ approved: true }).sort({ createdAt: -1 }).populate("organizer", "name");
+        const events = await Event.find({ approved: true }).sort({ createdAt: -1 }).populate("organizer", "name").populate("createdBy", "name");
         res.status(200).json({ events });
     } catch (error) {
         console.log(error);
@@ -180,7 +180,7 @@ export const allApprovedEvents = async (req, res) => {
 };
 export const allEvents = async (req, res) => {
     try {
-        const events = await Event.find({}).sort({ createdAt: -1 }).populate("organizer", "name");
+        const events = await Event.find({}).sort({ createdAt: -1 }).populate("organizer", "name").populate("createdBy", "name");
         res.status(200).json({ events });
     } catch (error) {
         console.log(error);
