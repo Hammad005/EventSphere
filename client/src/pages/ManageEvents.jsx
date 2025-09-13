@@ -139,7 +139,7 @@ const ManageEvents = () => {
             {/* Stat Cards */}
             {user?.role === "admin" && (
               <>
-                <div className="grid md:grid-cols-2 grid-cols-1 gap-8 w-full mt-5">
+                <div className="grid md:grid-cols-3 grid-cols-1 gap-8 w-full mt-5">
                   {Object.entries(eventGroups).map(([key, arr]) => (
                     <Card key={key} className="w-full">
                       <CardHeader>
