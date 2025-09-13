@@ -101,18 +101,38 @@ export const useEventStore = create((set) => ({
         }
     },
     participateInEvent: async (id) => {
-        set({registerLoading: true});
+        set({ registerLoading: true });
         try {
             const res = await axios.post(`/event/register/${id}`);
             useAuthStore.setState((state) => ({
                 participatedEvents: [res.data.eventId?._id, ...(state.participatedEvents || [])]
             }));
-            set({registerLoading: false});
+            set({ registerLoading: false });
             toast.success("Event registered successfully");
         } catch (error) {
-            set({registerLoading: false});
+            set({ registerLoading: false });
             toast.error(error.response.data.error);
             console.log(error);
+        }
+    },
+    postFeedback: async (id, data) => {
+        set({ eventLoading: true }); // should start as true while posting
+        try {
+            const res = await axios.post(`/event/feedback/${id}`, data);
+
+            set((state) => ({
+                events: state.events.map((event) =>
+                    event._id === id ? res.data.event : event
+                ),
+                eventLoading: false,
+            }));
+
+            toast.success("Feedback posted successfully");
+            return { success: true }
+        } catch (error) {
+            set({ eventLoading: false });
+            toast.error(error.response?.data?.error || "Failed to post feedback");
+            console.error(error);
         }
     }
 }))

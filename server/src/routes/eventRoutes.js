@@ -19,6 +19,6 @@ eventRouter.post('/register/:id', protectRoute, registerInEvent);
 eventRouter.patch('/attended/:id/:userId', protectRoute, eventAttended);
 eventRouter.patch('/issueCertificate/:id/:userId', protectRoute, issueCertificate);
 
-eventRouter.post('/feedback/:id', protectRoute, eventFeedback);
+eventRouter.post('/feedback/:id', eventFeedback);
 
 export default eventRouter;

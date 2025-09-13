@@ -390,7 +390,7 @@ export const issueCertificate = async (req, res) => {
 
 export const eventFeedback = async (req, res) => {
     const { id } = req.params;
-    const { name, message, rating } = req.body;
+    const { name, message } = req.body;
     try {
         const event = await Event.findById(id);
         if (!event) {
@@ -399,12 +399,11 @@ export const eventFeedback = async (req, res) => {
 
         event.feedback?.push({
             name,
-            message,
-            rating
+            message
         });
 
         await event.save();
-        return res.status(200).json({ message: "Successfully submitted feedback" });
+        return res.status(200).json({ message: "Successfully submitted feedback", event: event });
     } catch (error) {
         console.log(error);
         res.status(500)

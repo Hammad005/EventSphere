@@ -1,12 +1,24 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useEventStore } from "@/store/useEventStore";
 import { Loader2, TicketCheck } from "lucide-react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const SingleEvent = () => {
-  const { participateInEvent, registerLoading } = useEventStore();
+  const { participateInEvent, registerLoading, postFeedback, eventLoading } =
+    useEventStore();
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -15,9 +27,21 @@ const SingleEvent = () => {
   }, []);
   const { id } = useParams();
   const { user } = useAuthStore();
+  const [data, setData] = useState({
+    name: "",
+    message: "",
+  });
 
   const event = useEventStore((state) => state.events);
   const filterdEvent = event?.find((ev) => ev._id === id);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const res = await postFeedback(id, data);
+    if (res) {
+      setData({ name: "", message: "" });
+    }
+  };
   return (
     <>
       <div className="flex items-center justify-center min-h-[calc(100vh-75px)] w-full p-8">
@@ -80,10 +104,11 @@ const SingleEvent = () => {
             {filterdEvent?.fee}/-
           </p>
 
-          <div className="flex items-center justify-center w-full">
+          <div className="flex items-center justify-end w-full">
             {user && user?.role === "participant" && (
               <Button
-                className="w-1/2 mt-4"
+                size={"sm"}
+                className="mt-4"
                 onClick={() => participateInEvent(id)}
                 disabled={registerLoading}
               >
@@ -97,6 +122,59 @@ const SingleEvent = () => {
                 )}
               </Button>
             )}
+          </div>
+
+          <div className="flex flex-col-reverse items-center w-full mt-4">
+            <form
+              onSubmit={handleSubmit}
+              className="w-full flex flex-col gap-2 mt-5"
+            >
+              <h2 className="text-3xl font-bold mb-2 font-serif">Feedback:</h2>
+              <Label htmlFor="name">Name</Label>
+              <Input
+                type={"text"}
+                placeholder="Enter your name"
+                className="w-full"
+                required
+                value={data.name}
+                onChange={(e) => setData({ ...data, name: e.target.value })}
+              />
+              <Label htmlFor="feedback">Feedback</Label>
+              <Textarea
+                placeholder="Enter your feedback"
+                className="w-full min-h-30 max-h-30"
+                value={data.message}
+                required
+                onChange={(e) => setData({ ...data, message: e.target.value })}
+              />
+              <Button type="submit" className={"mt-2"} disabled={eventLoading}>
+                {eventLoading ? <Loader2 className="animate-spin" /> : "Submit"}
+              </Button>
+            </form>
+
+            {filterdEvent?.feedback?.length > 0 &&
+              <div className="w-1/2">
+                <p className="font-bold text-center mb-2">Total feedbacks: {filterdEvent?.feedback?.length}</p>
+                <Carousel>
+                  <CarouselContent>
+                    {filterdEvent?.feedback?.map((f, i) => (
+                      <CarouselItem key={i}>
+                        <Card>
+                          <CardHeader>
+                            <CardTitle>{f?.name}</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p>{f?.message}</p>
+                          </CardContent>
+                        </Card>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </Carousel>
+              </div>
+            }
           </div>
         </div>
       </div>
