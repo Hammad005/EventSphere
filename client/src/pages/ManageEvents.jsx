@@ -50,43 +50,55 @@ const ManageEvents = () => {
   const [editEvent, setEditEvent] = useState(null);
   const [deleteEvent, setDeleteEvent] = useState(null);
 
-  const approveRequest = events.filter((e) => !e.approved);
+  const approveRequest = events?.filter((e) => !e.approved);
   // Group filters in one place
   const eventGroups = {
     upcoming:
-  user?.role === "admin"
-    ? events.filter((e) => e.status === "upcoming" && e.approved)
-    : user?.role === "organizer"
-    ? events.filter(
-        (e) =>
-          e.status === "upcoming" &&
-          e.organizer?.toString() === user._id.toString()
-      )
-    : events.filter(
-        (e) =>
-          e.status === "upcoming" &&
-          e.approved &&
-          e.participants.some(
-            (p) => p.user?.toString() === user._id.toString()
+      user?.role === "admin"
+        ? events?.filter((e) => e.status === "upcoming" && e.approved)
+        : user?.role === "organizer"
+        ? events?.filter(
+            (e) =>
+              e.status === "upcoming" &&
+              e.organizer?.toString() === user._id.toString()
           )
-      ),
+        : events?.filter(
+            (e) =>
+              e.status === "upcoming" &&
+              e.approved &&
+              e.participants.some(
+                (p) => p.user?.toString() === user._id.toString()
+              )
+          ),
     ongoing:
       user?.role === "admin"
-        ? events.filter((e) => e.status === "ongoing" && e.approved)
-        : events.filter(
+        ? events?.filter((e) => e.status === "ongoing" && e.approved)
+        : user?.role === "organizer"
+        ? events?.filter(
             (e) => e.status === "ongoing" && e.organizer === user._id
+          )
+        : events?.filter(
+            (e) =>
+              e.status === "ongoing" &&
+              e.approved &&
+              e.participants.some(
+                (p) => p.user?.toString() === user._id.toString()
+              )
           ),
     completed:
       user?.role === "admin"
-        ? events.filter((e) => e.status === "completed" && e.approved)
-        : events.filter(
+        ? events?.filter((e) => e.status === "completed" && e.approved)
+        : user?.role === "organizer"
+        ? events?.filter(
             (e) => e.status === "completed" && e.organizer === user._id
-          ),
-    cancelled:
-      user?.role === "admin"
-        ? events.filter((e) => e.status === "cancelled" && e.approved)
-        : events.filter(
-            (e) => e.status === "cancelled" && e.organizer === user._id
+          )
+        : events?.filter(
+            (e) =>
+              e.status === "completed" &&
+              e.approved &&
+              e.participants.some(
+                (p) => p.user?.toString() === user._id.toString()
+              )
           ),
   };
 
@@ -99,7 +111,6 @@ const ManageEvents = () => {
     upcoming: "Upcoming Events",
     ongoing: "Ongoing Events",
     completed: "Completed Events",
-    cancelled: "Cancelled Events",
   };
 
   return (
@@ -172,7 +183,6 @@ const ManageEvents = () => {
                       <TableBody>
                         {approveRequest.length > 0 ? (
                           approveRequest?.map((event) => {
-
                             return (
                               <TableRow key={event._id}>
                                 <TableCell>
@@ -239,45 +249,62 @@ const ManageEvents = () => {
                 <Table>
                   <TableHeader className="bg-secondary">
                     <TableRow>
-                      {user?.role !== "participant" && <TableHead>Approved</TableHead>}
-                      {user?.role === "participant" && <TableHead>Certificated Issued</TableHead>}
+                      {user?.role !== "participant" && (
+                        <TableHead>Approved</TableHead>
+                      )}
+                      {user?.role === "participant" && (
+                        <TableHead>Certificated Issued</TableHead>
+                      )}
                       <TableHead>Title</TableHead>
                       <TableHead>Category</TableHead>
-                      {user?.role === "participant" && <TableHead>Department</TableHead>}
-                      {user?.role === "participant" && <TableHead>Venue</TableHead>}
+                      {user?.role === "participant" && (
+                        <TableHead>Department</TableHead>
+                      )}
+                      {user?.role === "participant" && (
+                        <TableHead>Venue</TableHead>
+                      )}
                       <TableHead>Start Date</TableHead>
                       <TableHead>End Date</TableHead>
                       <TableHead>Fee</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Organizer</TableHead>
-                      {user?.role !== "participant" && <TableHead>Total Participants</TableHead>}
+                      {user?.role !== "participant" && (
+                        <TableHead>Total Participants</TableHead>
+                      )}
                       <TableHead className={"text-center"}>Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {displayedEvents?.length > 0 ? (
                       displayedEvents?.map((event) => {
-
                         return (
                           <TableRow key={event._id}>
-                            {user?.role !== "participant" &&<TableCell>
-                              {event.approved ? (
-                                <Check className="text-green-500" />
-                              ) : (
-                                <X className="text-red-500" />
-                              )}
-                            </TableCell>}
-                            {user?.role === "participant" &&<TableCell>
-                              {event.participants.includes(user._id) ? (
-                                <Check className="text-green-500" />
-                              ) : (
-                                <X className="text-red-500" />
-                              )}
-                            </TableCell>}
+                            {user?.role !== "participant" && (
+                              <TableCell>
+                                {event.approved ? (
+                                  <Check className="text-green-500" />
+                                ) : (
+                                  <X className="text-red-500" />
+                                )}
+                              </TableCell>
+                            )}
+                            {user?.role === "participant" && (
+                              <TableCell>
+                                {event.participants.includes(user._id) ? (
+                                  <Check className="text-green-500" />
+                                ) : (
+                                  <X className="text-red-500" />
+                                )}
+                              </TableCell>
+                            )}
                             <TableCell>{event.title}</TableCell>
                             <TableCell>{event.category}</TableCell>
-                            {user?.role === "participant" && <TableCell>{event.department}</TableCell>}
-                            {user?.role === "participant" && <TableCell>{event.venue}</TableCell>}
+                            {user?.role === "participant" && (
+                              <TableCell>{event.department}</TableCell>
+                            )}
+                            {user?.role === "participant" && (
+                              <TableCell>{event.venue}</TableCell>
+                            )}
                             <TableCell>
                               {new Date(event.startDate).toLocaleString()}
                             </TableCell>
@@ -287,34 +314,41 @@ const ManageEvents = () => {
                             <TableCell>{event.fee}</TableCell>
                             <TableCell>{event.status}</TableCell>
                             <TableCell>{event.organizer.name}</TableCell>
-                            {user?.role !== "participant" && <TableCell className="text-center">
-                              {event.participants.length}
-                            </TableCell>}
+                            {user?.role !== "participant" && (
+                              <TableCell className="text-center">
+                                {event.participants.length}
+                              </TableCell>
+                            )}
                             <TableCell className={"flex gap-3"}>
-                              <Button size={"icon"} onClick={() => navigate(`/event/${event._id}`)}>
+                              <Button
+                                size={"icon"}
+                                onClick={() => navigate(`/event/${event._id}`)}
+                              >
                                 <Eye />
                               </Button>
                               {user && user.role !== "participant" && (
                                 <>
-                                <Button
-                                size={"icon"}
-                                variant={"outline"}
-                                onClick={() => {
-                                  setEditEvent(event._id);
-                                  setChange("edit");
-                                }}
-                              >
-                                <Edit />
-                              </Button>
-                              <Button
-                                size={"icon"}
-                                variant={"destructive"}
-                                onClick={() => {
-                                  setDeleteEvent(event);
-                                }}
-                              >
-                                <Trash2 />
-                              </Button></>)}
+                                  <Button
+                                    size={"icon"}
+                                    variant={"outline"}
+                                    onClick={() => {
+                                      setEditEvent(event._id);
+                                      setChange("edit");
+                                    }}
+                                  >
+                                    <Edit />
+                                  </Button>
+                                  <Button
+                                    size={"icon"}
+                                    variant={"destructive"}
+                                    onClick={() => {
+                                      setDeleteEvent(event);
+                                    }}
+                                  >
+                                    <Trash2 />
+                                  </Button>
+                                </>
+                              )}
                             </TableCell>
                           </TableRow>
                         );
