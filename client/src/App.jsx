@@ -35,10 +35,8 @@ const App = () => {
   }, [checkAuth]);
 
   useEffect(() => {
-    if (user && user?.role !== "admin") {
-      getAllApprovedEvents();
-    }
-  }, [getAllApprovedEvents, user?.role, user]);
+    getAllApprovedEvents();
+  }, [getAllApprovedEvents]);
 
   useEffect(() => {
     if (user?.role === "admin") {
